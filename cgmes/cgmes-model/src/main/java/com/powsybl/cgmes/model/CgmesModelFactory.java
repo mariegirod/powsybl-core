@@ -62,6 +62,7 @@ public final class CgmesModelFactory {
             TripleStore tripleStore = TripleStoreFactory.copy(cgmests.tripleStore());
             CgmesModel cgmesCopy = new CgmesModelTripleStore(cgmests.getCimNamespace(), tripleStore);
             cgmesCopy.setBasename(cgmes.getBasename());
+            cgmesCopy.copyConductingEquipmentTerminal(cgmes.getConductingEquipmentTerminal());
             buildCaches(cgmesCopy);
             return cgmesCopy;
         } else {

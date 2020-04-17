@@ -7,6 +7,7 @@
 
 package com.powsybl.cgmes.model;
 
+import com.powsybl.commons.PowsyblException;
 import com.powsybl.commons.datasource.DataSource;
 import com.powsybl.commons.datasource.ReadOnlyDataSource;
 import com.powsybl.triplestore.api.PropertyBags;
@@ -15,6 +16,7 @@ import org.joda.time.DateTime;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -177,7 +179,7 @@ public interface CgmesModel {
     // TODO If we could store identifiers for tap changers and terminals in IIDM
     // then we would not need to query back the CGMES model for these mappings
 
-    String terminalForEquipment(String conductingEquipmentId);
+    Map<Integer, String> terminalForEquipment(String conductingEquipmentId);
 
     String ratioTapChangerForPowerTransformer(String powerTransformerId);
 
@@ -208,4 +210,17 @@ public interface CgmesModel {
     default PropertyBags modelProfiles() {
         throw new UnsupportedOperationException();
     }
+
+    default void computeConductingEquipmentTerminal(String conductingEquipment, int terminalIndex, String cgmesTerminal) {
+        throw new PowsyblException();
+    }
+
+    default Map<String, Map<Integer, String>> getConductingEquipmentTerminal() {
+        return new HashMap<>();
+    }
+
+    default void copyConductingEquipmentTerminal(Map<String, Map<Integer, String>> terminalsIndexed) {
+        throw new PowsyblException();
+    }
+
 }

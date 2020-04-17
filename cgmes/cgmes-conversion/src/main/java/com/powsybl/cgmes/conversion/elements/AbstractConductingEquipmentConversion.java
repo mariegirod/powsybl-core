@@ -37,7 +37,7 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
         super(type, p, context);
         numTerminals = 1;
         terminals = new TerminalData[] {null, null, null};
-        terminals[0] = new TerminalData(CgmesNames.TERMINAL, p, context);
+        terminals[0] = new TerminalData(CgmesNames.TERMINAL, p, context, 1);
         steadyStatePowerFlow = new PowerFlow(p, "p", "q");
     }
 
@@ -55,7 +55,7 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
         this.numTerminals = numTerminals;
         for (int k = 1; k <= numTerminals; k++) {
             int k0 = k - 1;
-            terminals[k0] = new TerminalData(CgmesNames.TERMINAL + k, p, context);
+            terminals[k0] = new TerminalData(CgmesNames.TERMINAL + k, p, context, k);
         }
         steadyStatePowerFlow = PowerFlow.UNDEFINED;
     }
@@ -72,7 +72,7 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
         assert numTerminals <= 3;
         for (int k = 1; k <= numTerminals; k++) {
             int k0 = k - 1;
-            terminals[k0] = new TerminalData(CgmesNames.TERMINAL, ps.get(k0), context);
+            terminals[k0] = new TerminalData(CgmesNames.TERMINAL, ps.get(k0), context, k);
         }
         steadyStatePowerFlow = PowerFlow.UNDEFINED;
     }
@@ -286,7 +286,7 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
         private final String iidmVoltageLevelId;
         private final VoltageLevel voltageLevel;
 
-        TerminalData(String terminalPropertyName, PropertyBag p, Context context) {
+        TerminalData(String terminalPropertyName, PropertyBag p, Context context, int num) {
             t = context.cgmes().terminal(p.getId(terminalPropertyName));
             String nodeId = context.nodeBreaker() ? t.connectivityNode() : t.topologicalNode();
             this.busId = context.namingStrategy().getId("Bus", nodeId);
@@ -306,6 +306,7 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
                 iidmVoltageLevelId = null;
                 voltageLevel = null;
             }
+            context.cgmes().computeConductingEquipmentTerminal(t.conductingEquipment(), num,  t.id());
         }
     }
 
