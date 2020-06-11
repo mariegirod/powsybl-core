@@ -11,8 +11,6 @@ import com.google.common.jimfs.Jimfs;
 import com.powsybl.commons.config.InMemoryPlatformConfig;
 import com.powsybl.commons.config.MapModuleConfig;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.test.EurostagTutorialExample1Factory;
-import com.powsybl.iidm.network.test.NetworkTest1Factory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,30 +39,6 @@ public class NetworkDiffTest {
 
     private DiffConfig config;
 
-    private Network createNetwork() {
-        Network network = EurostagTutorialExample1Factory.create();
-        network.getBusView().getBus("VLGEN_0").setV(24.5).setAngle(2.33);
-        network.getBusView().getBus("VLHV1_0").setV(402.14).setAngle(0);
-        network.getBusView().getBus("VLHV2_0").setV(389.95).setAngle(-3.5);
-        network.getBusView().getBus("VLLOAD_0").setV(147.58).setAngle(9.61);
-        network.getLine("NHV1_NHV2_1").getTerminal1().setP(302.4).setQ(98.7);
-        network.getLine("NHV1_NHV2_1").getTerminal2().setP(-300.4).setQ(-137.1);
-        network.getLine("NHV1_NHV2_2").getTerminal1().setP(302.4).setQ(98.7);
-        network.getLine("NHV1_NHV2_2").getTerminal2().setP(-300.4).setQ(-137.1);
-        network.getTwoWindingsTransformer("NGEN_NHV1").getTerminal1().setP(607).setQ(225.4);
-        network.getTwoWindingsTransformer("NGEN_NHV1").getTerminal2().setP(-606.3).setQ(-197.4);
-        network.getTwoWindingsTransformer("NHV2_NLOAD").getTerminal1().setP(600).setQ(274.3);
-        network.getTwoWindingsTransformer("NHV2_NLOAD").getTerminal2().setP(-600).setQ(-200);
-        network.getGenerator("GEN").getTerminal().setP(607).setQ(225.4);
-        network.getLoad("LOAD").getTerminal().setP(600).setQ(200);
-        return network;
-    }
-
-    private Network createNetwork2() {
-        Network network = NetworkTest1Factory.create();
-        return network;
-    }
-
     private void checkValues(DiffConfig config, double genericThreshold, boolean filterDifferent) {
         assertEquals(config.getGenericTreshold(), genericThreshold, 0.0);
         assertEquals(config.isFilterDifferent(), filterDifferent);
@@ -78,14 +52,11 @@ public class NetworkDiffTest {
 
         config = DiffConfig.load(platformConfig);
 
-        network1 = createNetwork();
-        network2 = createNetwork();
-        network2.getBranches().iterator().next().remove();
-        network2.getBusView().getBus("VLHV2_0").setV(350);
+        network1 = NetworkDiffTestUtils.createNetwork1();
+        network2 = NetworkDiffTestUtils.createNetwork2();
 
-        network3 = createNetwork2();
-        network4 = createNetwork2();
-        network4.getSwitch("voltageLevel1Breaker1").setOpen(true);
+        network3 = NetworkDiffTestUtils.createNetwork3();
+        network4 = NetworkDiffTestUtils.createNetwork4();
     }
 
     @After
@@ -143,6 +114,14 @@ public class NetworkDiffTest {
         NetworkDiffResults ndifr = ndiff.diff(network1, network2);
         NetworkDiff.writeJson(outFile, ndifr);
         assertTrue(Files.exists(outFile));
+    }
+
+    @Test
+    public void testDifferencesToString() {
+        NetworkDiff ndiff = new NetworkDiff(config);
+        NetworkDiffResults ndifr = ndiff.diff(network1, network2);
+        String ndiffJson = NetworkDiff.writeJson(ndifr);
+        assertNotNull(ndiffJson);
     }
 
     @Test

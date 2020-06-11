@@ -20,8 +20,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import java.nio.file.Paths;
-
 /**
  *
  * @author Christian Biasuzzi <christian.biasuzzi@techrain.eu>
@@ -45,7 +43,7 @@ public class DiffTool implements Tool {
 
             @Override
             public String getDescription() {
-                return "compare two networks";
+                return "Compare two networks";
             }
 
             @Override
@@ -86,7 +84,7 @@ public class DiffTool implements Tool {
 
             @Override
             public String getUsageFooter() {
-                return "Where OUTPUT_FORMAT is one of ";
+                return null;
             }
         };
     }
@@ -106,6 +104,6 @@ public class DiffTool implements Tool {
         Network network1 = Importers.loadNetwork(context.getFileSystem().getPath(inputFile1), context.getShortTimeExecutionComputationManager(), importConfig, null);
         Network network2 = Importers.loadNetwork(context.getFileSystem().getPath(inputFile2), context.getShortTimeExecutionComputationManager(), importConfig, null);
         NetworkDiffResults ndifr = new NetworkDiff(config).diff(network1, network2, ids);
-        NetworkDiff.writeJson(Paths.get(outputFile), ndifr);
+        NetworkDiff.writeJson(context.getFileSystem().getPath(outputFile), ndifr);
     }
 }
