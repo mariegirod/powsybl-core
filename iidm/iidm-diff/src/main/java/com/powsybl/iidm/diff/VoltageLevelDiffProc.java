@@ -7,13 +7,22 @@
 package com.powsybl.iidm.diff;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.Maps;
 import com.google.common.math.DoubleMath;
 import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.Switch;
 import com.powsybl.iidm.network.VoltageLevel;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Christian Biasuzzi <christian.biasuzzi@techrain.eu>
@@ -57,11 +66,22 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
                 generator.writeNumberField("vl.maxV1", vlInfo1.getMaxV());
                 generator.writeNumberField("vl.maxV2", vlInfo2.getMaxV());
                 generator.writeNumberField("vl.maxV-delta", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()));
+                writeJson(generator, "vl.switchesV1", vlInfo1);
+                writeJson(generator, "vl.switchesV2", vlInfo2);
                 generator.writeBooleanField("vl.isDifferent", isDifferent);
                 generator.writeEndObject();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
+        }
+
+        private void writeJson(JsonGenerator generator, String name, VoltageLevelDiffInfo vlInfo) throws IOException {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final List<ObjectNode> collected = vlInfo.getSwitchesStatus().entrySet()
+                    .stream()
+                    .map(entry -> objectMapper.createObjectNode().put(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+            generator.writeStringField(name, objectMapper.writeValueAsString(collected));
         }
     }
 
@@ -73,9 +93,15 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
         double minV2 = vl2.getBusView().getBusStream().mapToDouble(Bus::getV).min().orElse(0);
         long noBusesVl1 = vl1.getBusView().getBusStream().count();
         long noBusesVl2 = vl2.getBusView().getBusStream().count();
+
+        Map<String, Boolean> switchesStatusVl1 = StreamSupport.stream(vl1.getSwitches().spliterator(), false).collect(Collectors.toMap(Switch::getId, Switch::isOpen));
+        Map<String, Boolean> switchesStatusVl2 = StreamSupport.stream(vl2.getSwitches().spliterator(), false).collect(Collectors.toMap(Switch::getId, Switch::isOpen));
+        MapDifference<String, Boolean> switchesDiff = Maps.difference(switchesStatusVl1, switchesStatusVl2);
+
         boolean isEqual = DoubleMath.fuzzyEquals(maxV1, maxV2, config.getGenericTreshold())
                 && DoubleMath.fuzzyEquals(minV1, minV2, config.getGenericTreshold())
-                && (noBusesVl1 == noBusesVl2);
-        return new VoltageLevelDiffResult(new VoltageLevelDiffInfo(vl1.getId(), noBusesVl1, minV1, maxV1), new VoltageLevelDiffInfo(vl2.getId(), noBusesVl2, minV2, maxV2), !isEqual);
+                && (noBusesVl1 == noBusesVl2)
+                && (switchesDiff.areEqual());
+        return new VoltageLevelDiffResult(new VoltageLevelDiffInfo(vl1.getId(), noBusesVl1, minV1, maxV1, switchesStatusVl1), new VoltageLevelDiffInfo(vl2.getId(), noBusesVl2, minV2, maxV2, switchesStatusVl2), !isEqual);
     }
 }

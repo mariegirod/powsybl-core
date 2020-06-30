@@ -6,6 +6,8 @@
  */
 package com.powsybl.iidm.diff;
 
+import java.util.Map;
+
 /**
  * @author Christian Biasuzzi <christian.biasuzzi@techrain.eu>
  */
@@ -14,12 +16,14 @@ public class VoltageLevelDiffInfo {
     private final long noBus;
     private final double minV;
     private final double maxV;
+    private final Map<String, Boolean> switchesStatus;
 
-    public VoltageLevelDiffInfo(String vlId, long noBus, double minV, double maxV) {
+    public VoltageLevelDiffInfo(String vlId, long noBus, double minV, double maxV, Map<String, Boolean> switchesStatus) {
         this.vlId = vlId;
         this.noBus = noBus;
         this.minV = minV;
         this.maxV = maxV;
+        this.switchesStatus = switchesStatus;
     }
 
     public String getVlId() {
@@ -36,5 +40,9 @@ public class VoltageLevelDiffInfo {
 
     public double getMaxV() {
         return maxV;
+    }
+
+    public Map<String, Boolean> getSwitchesStatus() {
+        return switchesStatus;
     }
 }

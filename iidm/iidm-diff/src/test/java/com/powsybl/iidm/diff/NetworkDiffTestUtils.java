@@ -55,4 +55,16 @@ public final class NetworkDiffTestUtils {
         return network;
     }
 
+    public static Network createNetwork5() {
+        Network network = NetworkTest1Factory.create();
+        return network;
+    }
+
+    public static Network createNetwork6() {
+        Network network = NetworkDiffTestUtils.createNetwork5();
+        network.getSwitch("voltageLevel1Breaker1").setOpen(true);
+        network.getSwitch("load1Disconnector1").setOpen(true);
+        return network;
+    }
+
 }
