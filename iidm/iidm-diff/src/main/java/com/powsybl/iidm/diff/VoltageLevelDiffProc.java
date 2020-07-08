@@ -8,7 +8,6 @@ package com.powsybl.iidm.diff;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.google.common.math.DoubleMath;
@@ -18,7 +17,6 @@ import com.powsybl.iidm.network.VoltageLevel;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -66,8 +64,9 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
                 generator.writeNumberField("vl.maxV1", vlInfo1.getMaxV());
                 generator.writeNumberField("vl.maxV2", vlInfo2.getMaxV());
                 generator.writeNumberField("vl.maxV-delta", Math.abs(vlInfo1.getMaxV() - vlInfo2.getMaxV()));
-                writeJson(generator, "vl.switchesV1", vlInfo1);
-                writeJson(generator, "vl.switchesV2", vlInfo2);
+                writeSwitchesStatusJson(generator, "vl.switchesStatusV1", vlInfo1);
+                writeSwitchesStatusJson(generator, "vl.switchesStatusV2", vlInfo2);
+                writeSwitchesDeltaJson(generator, "vl.switchesStatus-delta", vlInfo1, vlInfo2);
                 generator.writeBooleanField("vl.isDifferent", isDifferent);
                 generator.writeEndObject();
             } catch (IOException e) {
@@ -75,13 +74,14 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
             }
         }
 
-        private void writeJson(JsonGenerator generator, String name, VoltageLevelDiffInfo vlInfo) throws IOException {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final List<ObjectNode> collected = vlInfo.getSwitchesStatus().entrySet()
-                    .stream()
-                    .map(entry -> objectMapper.createObjectNode().put(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-            generator.writeStringField(name, objectMapper.writeValueAsString(collected));
+        private void writeSwitchesStatusJson(JsonGenerator generator, String name, VoltageLevelDiffInfo vlInfo) throws IOException {
+            generator.writeFieldName(name);
+            new ObjectMapper().writeValue(generator, vlInfo.getSwitchesStatus());
+        }
+
+        private void writeSwitchesDeltaJson(JsonGenerator generator, String name, VoltageLevelDiffInfo vlInfo1, VoltageLevelDiffInfo vlInfo2) throws IOException {
+            generator.writeFieldName(name);
+            new ObjectMapper().writeValue(generator, Maps.difference(vlInfo1.getSwitchesStatus(), vlInfo2.getSwitchesStatus()).entriesDiffering().keySet());
         }
     }
 
