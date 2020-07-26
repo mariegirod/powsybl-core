@@ -35,7 +35,7 @@ class OwnerData extends BlockData {
     }
 
     List<PsseOwner> read(BufferedReader reader, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.OwnerData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.OWNER_DATA, PsseVersion.VERSION_33);
 
         String[] headers = ownerDataHeaders(this.getPsseVersion());
         List<String> records = readRecordBlock(reader);
@@ -44,8 +44,8 @@ class OwnerData extends BlockData {
         return parseRecordsHeader(records, PsseOwner.class, headers);
     }
 
-    List<PsseOwner> read(JsonNode networkNode, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.OwnerData, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+    List<PsseOwner> readx(JsonNode networkNode, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.OWNER_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         JsonNode ownerNode = networkNode.get("owner");
         if (ownerNode == null) {
@@ -60,7 +60,7 @@ class OwnerData extends BlockData {
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
-        assertMinimumExpectedVersion(PsseBlockData.OwnerData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.OWNER_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getOwnerDataReadFields();
         BlockData.<PsseOwner>writeBlock(PsseOwner.class, model.getOwners(), headers,

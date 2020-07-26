@@ -39,7 +39,7 @@ class CaseIdentificationData extends BlockData {
     }
 
     PsseCaseIdentification read(BufferedReader reader, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_33);
 
         String line = readLineAndRemoveComment(reader);
         Objects.requireNonNull(line);
@@ -56,7 +56,7 @@ class CaseIdentificationData extends BlockData {
     }
 
     PsseCaseIdentification read(BufferedReader reader) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_33);
 
         String line = readLineAndRemoveComment(reader);
         Objects.requireNonNull(line);
@@ -69,8 +69,8 @@ class CaseIdentificationData extends BlockData {
         return caseIdentification;
     }
 
-    PsseCaseIdentification read(JsonNode networkNode) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+    PsseCaseIdentification readx(JsonNode networkNode) {
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         JsonNode caseIdentificationNode = networkNode.get("caseid");
         if (caseIdentificationNode == null) {
@@ -87,8 +87,8 @@ class CaseIdentificationData extends BlockData {
         return caseIdentificationList.get(0);
     }
 
-    PsseCaseIdentification read(JsonNode networkNode, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+    PsseCaseIdentification readx(JsonNode networkNode, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         context.setDelimiter(",");
 
@@ -109,7 +109,7 @@ class CaseIdentificationData extends BlockData {
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
-        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getCaseIdentificationDataReadFields();
         headers = BlockData.excludeFields(headers, caseIdentificationDataExcludedFields());

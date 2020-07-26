@@ -37,7 +37,7 @@ class NonTransformerBranchData extends BlockData {
     }
 
     List<PsseNonTransformerBranch> read(BufferedReader reader, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.NonTransformerBranchData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.NON_TRANSFORMER_BRANCH_DATA, PsseVersion.VERSION_33);
 
         List<String> records = readRecordBlock(reader);
         String[] headers = nonTransformerBranchDataHeaders(this.getPsseVersion());
@@ -51,8 +51,8 @@ class NonTransformerBranchData extends BlockData {
         }
     }
 
-    List<PsseNonTransformerBranch> read(JsonNode networkNode, PsseContext context) throws IOException {
-        assertMinimumExpectedVersion(PsseBlockData.NonTransformerBranchData, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+    List<PsseNonTransformerBranch> readx(JsonNode networkNode, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.NON_TRANSFORMER_BRANCH_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         JsonNode nonTransformerBranchNode = networkNode.get("acline");
         if (nonTransformerBranchNode == null) {
@@ -68,7 +68,7 @@ class NonTransformerBranchData extends BlockData {
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
-        assertMinimumExpectedVersion(PsseBlockData.NonTransformerBranchData, PsseVersion.VERSION_33);
+        assertMinimumExpectedVersion(PsseBlockData.NON_TRANSFORMER_BRANCH_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getNonTransformerBranchDataReadFields();
         String[] quoteFields = BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers);
