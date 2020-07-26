@@ -6,11 +6,12 @@
  */
 package com.powsybl.psse.model;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import java.util.Objects;
 
+import com.powsybl.commons.datasource.DataSource;
 import com.powsybl.psse.model.data.PsseData;
 
 /**
@@ -54,5 +55,16 @@ public class PsseRawReader {
         Objects.requireNonNull(context);
 
         return new PsseData().readx(jsonFile, context);
+    }
+
+    public void write(PsseRawModel model, PsseContext context, DataSource dataSource) throws IOException {
+        Objects.requireNonNull(model);
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(dataSource);
+
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "csv", false));
+        new PsseData().write(model, context, bufferedOutputStream);
+
+        bufferedOutputStream.close();
     }
 }

@@ -8,8 +8,10 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
@@ -17,6 +19,7 @@ import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseLoad;
 import com.powsybl.psse.model.PsseLoad35;
+import com.powsybl.psse.model.PsseRawModel;
 
 /**
  *
@@ -64,12 +67,41 @@ class LoadData extends BlockData {
         return new ArrayList<>(load35List); // TODO improve
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.LoadData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getLoadDataReadFields();
+        String[] quoteFields = BlockData.quoteFieldsInsideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers);
+
+        if (this.getPsseVersion() == PsseVersion.VERSION_35) {
+
+            List<PsseLoad35> load35List = model.getLoads().stream()
+                .map(m -> (PsseLoad35) m).collect(Collectors.toList()); // TODO improve
+
+            BlockData.<PsseLoad35>writeBlock(PsseLoad35.class, load35List, headers, quoteFields,
+                context.getDelimiter().charAt(0), outputStream);
+        } else {
+            BlockData.<PsseLoad>writeBlock(PsseLoad.class, model.getLoads(), headers, quoteFields,
+                context.getDelimiter().charAt(0), outputStream);
+        }
+
+        BlockData.writeEndOfBlockAndComment("END OF LOAD DATA, BEGIN FIXED SHUNT DATA", outputStream);
+    }
+
     private static String[] loadDataHeaders(PsseVersion version) {
         if (version == PsseVersion.VERSION_35) {
             return new String[] {"ibus", "loadid", "stat", "area", "zone", "pl", "ql", "ip", "iq", "yp", "yq", "owner", "scale", "intrpt",
                 "dgenp", "dgenq", "dgenm", "loadtype"};
         } else { // Version 33
             return new String[] {"i", "id", "status", "area", "zone", "pl", "ql", "ip", "iq", "yp", "yq", "owner", "scale", "intrpt"};
+        }
+    }
+
+    private static String[] loadDataQuoteFields(PsseVersion version) {
+        if (version == PsseVersion.VERSION_35) {
+            return new String[] {"loadid", "loadtype"};
+        } else { // Version 33
+            return new String[] {"id"};
         }
     }
 }

@@ -8,6 +8,7 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.powsybl.psse.model.PsseArea;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
+import com.powsybl.psse.model.PsseRawModel;
 
 /**
  *
@@ -57,11 +59,25 @@ class AreaInterchangeData extends BlockData {
         return parseRecordsHeader(records, PsseArea.class, headers);
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.AreaInterchangeData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getAreaInterchangeDataReadFields();
+        BlockData.<PsseArea>writeBlock(PsseArea.class, model.getAreas(), headers,
+            BlockData.quoteFieldsInsideHeaders(areaInterchangeDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            outputStream);
+        BlockData.writeEndOfBlockAndComment("END OF AREA DATA, BEGIN TWO-TERMINAL DC DATA", outputStream);
+    }
+
     private static String[] areaInterchangeDataHeaders(PsseVersion version) {
         if (version == PsseVersion.VERSION_35) {
             return new String[] {"iarea", "isw", "pdes", "ptol", "arname"};
         } else {
             return new String[] {"i", "isw", "pdes", "ptol", "arname"};
         }
+    }
+
+    private static String[] areaInterchangeDataQuoteFields() {
+        return new String[] {"arname"};
     }
 }

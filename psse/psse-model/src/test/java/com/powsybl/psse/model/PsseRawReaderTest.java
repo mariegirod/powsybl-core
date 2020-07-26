@@ -8,6 +8,8 @@ package com.powsybl.psse.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
+import com.powsybl.commons.datasource.FileDataSource;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -244,8 +248,7 @@ public class PsseRawReaderTest {
 
             String[] expectedCaseIdentificationDataReadFields = new String[] {"ic", "sbase", "rev", "xfrrat", "nxfrat", "basfrq", "title1", "title2"};
             String[] actualCaseIdentificationDataReadFields = context.getCaseIdentificationDataReadFields();
-            assertTrue(
-                compareReadFields(expectedCaseIdentificationDataReadFields, actualCaseIdentificationDataReadFields));
+            assertTrue(compareReadFields(expectedCaseIdentificationDataReadFields, actualCaseIdentificationDataReadFields));
 
             String[] expectedBusDataReadFields = new String[] {"ibus", "name", "baskv", "ide", "area", "zone", "owner", "vm", "va"};
             String[] actualBusDataReadFields = context.getBusDataReadFields();
@@ -291,6 +294,32 @@ public class PsseRawReaderTest {
             String[] expectedOwnerDataReadFields = new String[] {"iowner", "owname"};
             String[] actualOwnerDataReadFields = context.getOwnerDataReadFields();
             assertTrue(compareReadFields(expectedOwnerDataReadFields, actualOwnerDataReadFields));
+        }
+    }
+
+    @Test
+    public void ieee14BusWriteTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawReader psseRawReader = new PsseRawReader();
+            PsseRawModel rawData = psseRawReader.read(reader, context);
+            assertNotNull(rawData);
+
+            Path out = Paths.get("\\work\\tmp");
+            psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_export.raw"));
+        }
+    }
+
+    @Test
+    public void ieee14BusRev35WriteTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_rev35.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawReader psseRawReader = new PsseRawReader();
+            PsseRawModel rawData = psseRawReader.read(reader, context);
+            assertNotNull(rawData);
+
+            Path out = Paths.get("\\work\\tmp");
+            psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev35_export.raw"));
         }
     }
 

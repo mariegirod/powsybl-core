@@ -8,6 +8,7 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
+import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseTransformer;
 import com.powsybl.psse.model.PsseTransformer35;
 
@@ -139,6 +141,18 @@ class TransformerData extends BlockData {
                 return;
             }
         }
+    }
+
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.TransformerData, PsseVersion.VERSION_33);
+
+        // String[] headers = context.getNonTransformerBranchDataReadFields();
+        // BlockData.<PsseTransformer>writeBlock(PsseTransformer.class,
+        // model.getTransformers(), headers,
+        // BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()),
+        // headers),
+        // context.getDelimiter().charAt(0), outputStream);
+        BlockData.writeEndOfBlockAndComment("END OF TRANSFORMER DATA, BEGIN AREA DATA", outputStream);
     }
 
     private static String[] transformerDataHeaders(int record1Fields, int record2Fields, int record3Fields, int record4Fields, PsseVersion version) {

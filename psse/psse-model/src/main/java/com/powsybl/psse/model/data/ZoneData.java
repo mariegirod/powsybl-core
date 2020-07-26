@@ -8,6 +8,7 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
+import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseZone;
 
 /**
@@ -57,11 +59,25 @@ class ZoneData extends BlockData {
         return parseRecordsHeader(records, PsseZone.class, headers);
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.ZoneData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getZoneDataReadFields();
+        BlockData.<PsseZone>writeBlock(PsseZone.class, model.getZones(), headers,
+            BlockData.quoteFieldsInsideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            outputStream);
+        BlockData.writeEndOfBlockAndComment("END OF ZONE DATA, BEGIN INTER-AREA TRANSFER DATA", outputStream);
+    }
+
     private static String[] zoneDataHeaders(PsseVersion version) {
         if (version == PsseVersion.VERSION_35) {
             return new String[] {"izone", "zoname"};
         } else {
             return new String[] {"i", "zoname"};
         }
+    }
+
+    private static String[] zoneDataQuoteFields() {
+        return new String[] {"zoname"};
     }
 }

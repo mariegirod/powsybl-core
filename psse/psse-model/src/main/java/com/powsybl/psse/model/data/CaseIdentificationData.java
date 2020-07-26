@@ -8,6 +8,8 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,6 +21,7 @@ import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseException;
+import com.powsybl.psse.model.PsseRawModel;
 
 /**
  *
@@ -105,6 +108,22 @@ class CaseIdentificationData extends BlockData {
         return caseIdentificationList.get(0);
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.CaseIdentificationData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getCaseIdentificationDataReadFields();
+        headers = BlockData.excludeFields(headers, caseIdentificationDataExcludedFields());
+
+        List<PsseCaseIdentification> caseIdentificationList = new ArrayList<>();
+        caseIdentificationList.add(model.getCaseIdentification());
+
+        BlockData.<PsseCaseIdentification>writeBlock(PsseCaseIdentification.class, caseIdentificationList, headers,
+            BlockData.quoteFieldsInsideHeaders(caseIdentificationDataQuoteFields(), headers),
+            context.getDelimiter().charAt(0), outputStream);
+        writeStringLine(model.getCaseIdentification().getTitle1(), outputStream);
+        writeStringLine(model.getCaseIdentification().getTitle2(), outputStream);
+    }
+
     private static String[] caseIdentificationDataHeaders(int firstRecordFields) {
         String[] first = new String[] {"ic", "sbase", "rev", "xfrrat", "nxfrat", "basfrq"};
         return ArrayUtils.addAll(ArrayUtils.subarray(first, 0, firstRecordFields), "title1", "title2");
@@ -112,5 +131,13 @@ class CaseIdentificationData extends BlockData {
 
     private static String[] caseIdentificationDataHeaders() {
         return new String[] {"ic", "sbase", "rev", "xfrrat", "nxfrat", "basfrq", "title1", "title2"};
+    }
+
+    private static String[] caseIdentificationDataQuoteFields() {
+        return new String[] {};
+    }
+
+    private static String[] caseIdentificationDataExcludedFields() {
+        return new String[] {"title1", "title2"};
     }
 }

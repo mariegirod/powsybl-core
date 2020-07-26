@@ -8,8 +8,10 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
@@ -17,6 +19,7 @@ import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseGenerator;
 import com.powsybl.psse.model.PsseGenerator35;
+import com.powsybl.psse.model.PsseRawModel;
 
 /**
  *
@@ -64,6 +67,28 @@ class GeneratorData extends BlockData {
         return new ArrayList<>(generator35List); // TODO improve
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.GeneratorData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getGeneratorDataReadFields();
+        String[] quoteFields = BlockData.quoteFieldsInsideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers);
+
+        if (this.getPsseVersion() == PsseVersion.VERSION_35) {
+
+            List<PsseGenerator35> generator35List = model.getGenerators().stream()
+                .map(m -> (PsseGenerator35) m).collect(Collectors.toList()); // TODO improve
+
+            BlockData.<PsseGenerator35>writeBlock(PsseGenerator35.class, generator35List, headers,
+                quoteFields, context.getDelimiter().charAt(0), outputStream);
+
+        } else {
+            BlockData.<PsseGenerator>writeBlock(PsseGenerator.class, model.getGenerators(), headers,
+                quoteFields, context.getDelimiter().charAt(0), outputStream);
+        }
+
+        BlockData.writeEndOfBlockAndComment("END OF GENERATOR DATA, BEGIN BRANCH DATA", outputStream);
+    }
+
     private static String[] generatorDataHeaders(PsseVersion version) {
         if (version == PsseVersion.VERSION_35) {
             return new String[] {"ibus", "machid", "pg", "qg", "qt", "qb", "vs", "ireg", "nreg", "mbase", "zr", "zx", "rt",
@@ -72,6 +97,15 @@ class GeneratorData extends BlockData {
         } else { // Version 33
             return new String[] {"i", "id", "pg", "qg", "qt", "qb", "vs", "ireg", "mbase", "zr", "zx", "rt",
                 "xt", "gtap", "stat", "rmpct", "pt", "pb", "o1", "f1", "o2", "f2", "o3", "f3", "o4", "f4", "wmod", "wpf"};
+        }
+    }
+
+    private static String[] generatorDataQuoteFields(PsseVersion version) {
+        if (version == PsseVersion.VERSION_35) {
+            return new String[] {"machid"};
+
+        } else { // Version 33
+            return new String[] {"id"};
         }
     }
 }

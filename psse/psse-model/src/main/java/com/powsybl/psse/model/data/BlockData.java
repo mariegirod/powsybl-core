@@ -8,6 +8,7 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,8 +29,11 @@ import com.univocity.parsers.common.DataProcessingException;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.RetryableErrorHandler;
 import com.univocity.parsers.common.processor.BeanListProcessor;
+import com.univocity.parsers.common.processor.BeanWriterProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvWriter;
+import com.univocity.parsers.csv.CsvWriterSettings;
 
 /**
  *
@@ -131,6 +135,66 @@ class BlockData {
         CsvParser parser = new CsvParser(settings);
         parser.parseLine(record);
         return parser.getDetectedFormat().getDelimiterString();
+    }
+
+    // write
+
+    static <T> void writeBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
+        char delimiter, OutputStream outputStream) {
+
+        BeanWriterProcessor<T> processor = new BeanWriterProcessor<>(aClass);
+
+        CsvWriterSettings settings = new CsvWriterSettings();
+        settings.quoteFields(quoteFields);
+        settings.setHeaders(headers);
+        settings.getFormat().setQuote('\'');
+        settings.getFormat().setDelimiter(delimiter);
+        settings.setIgnoreLeadingWhitespaces(false);
+        settings.setIgnoreTrailingWhitespaces(false);
+        settings.setRowWriterProcessor(processor);
+
+        CsvWriter writer = new CsvWriter(outputStream, settings);
+        writer.processRecords(modelRecords);
+        writer.flush();
+    }
+
+    public static void writeEndOfBlock(OutputStream outputStream) {
+        CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
+        writer.addValue(0);
+        writer.writeValuesToRow();
+        writer.flush();
+    }
+
+    // To avoid automatic quotes
+    public static void writeEndOfBlockAndComment(String comment, OutputStream outputStream) {
+        CsvWriterSettings settings = new CsvWriterSettings();
+        settings.getFormat().setComment('0');
+        settings.setIgnoreLeadingWhitespaces(false);
+        settings.setIgnoreTrailingWhitespaces(false);
+        CsvWriter writer = new CsvWriter(outputStream, settings);
+        writer.commentRow(" / " + comment);
+        writer.flush();
+    }
+
+    // To avoid automatic quotes
+    public static void writeStringLine(String line, OutputStream outputStream) {
+        if (line.isEmpty()) {
+            CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
+            writer.writeEmptyRow();
+            writer.flush();
+        } else {
+            CsvWriterSettings settings = new CsvWriterSettings();
+            settings.getFormat().setComment(line.charAt(0));
+            settings.setIgnoreLeadingWhitespaces(false);
+            settings.setIgnoreTrailingWhitespaces(false);
+            CsvWriter writer = new CsvWriter(outputStream, settings);
+            writer.commentRow(line.substring(1));
+            writer.flush();
+        }
+    }
+
+    public static void writeQrecord(OutputStream outputStream) {
+        writeStringLine("Q", outputStream);
     }
 
     // Read
@@ -242,6 +306,28 @@ class BlockData {
 
     static String[] readFields(String record, String[] headers, String delimiter) {
         return ArrayUtils.subarray(headers, 0, record.split(delimiter).length);
+    }
+
+    // Fields
+
+    static String[] quoteFieldsInsideHeaders(String[] quoteFields, String[] headers) {
+        String[] quoteFieldsInside = new String[] {};
+        for (int i = 0; i < quoteFields.length; i++) {
+            if (ArrayUtils.contains(headers, quoteFields[i])) {
+                quoteFieldsInside = ArrayUtils.add(quoteFieldsInside, quoteFields[i]);
+            }
+        }
+        return quoteFieldsInside;
+    }
+
+    static String[] excludeFields(String[] initialFields, String[] excludedFields) {
+        String[] fields = new String[] {};
+        for (int i = 0; i < initialFields.length; i++) {
+            if (!ArrayUtils.contains(excludedFields, initialFields[i])) {
+                fields = ArrayUtils.add(fields, initialFields[i]);
+            }
+        }
+        return fields;
     }
 
     // Version and file format management

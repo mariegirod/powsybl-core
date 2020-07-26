@@ -43,7 +43,7 @@ public class PsseContext {
         this.caseIdentificationDataReadFields = fields;
     }
 
-    String[] getCaseIdentificationDataReadFields() {
+    public String[] getCaseIdentificationDataReadFields() {
         return this.caseIdentificationDataReadFields;
     }
 
@@ -51,7 +51,7 @@ public class PsseContext {
         this.busDataReadFields = fields;
     }
 
-    String[] getBusDataReadFields() {
+    public String[] getBusDataReadFields() {
         return this.busDataReadFields;
     }
 
@@ -59,7 +59,7 @@ public class PsseContext {
         this.loadDataReadFields = fields;
     }
 
-    String[] getLoadDataReadFields() {
+    public String[] getLoadDataReadFields() {
         return this.loadDataReadFields;
     }
 
@@ -67,7 +67,7 @@ public class PsseContext {
         this.fixedBusShuntDataReadFields = fields;
     }
 
-    String[] getFixedBusShuntDataReadFields() {
+    public String[] getFixedBusShuntDataReadFields() {
         return this.fixedBusShuntDataReadFields;
     }
 
@@ -75,7 +75,7 @@ public class PsseContext {
         this.generatorDataReadFields = fields;
     }
 
-    String[] getGeneratorDataReadFields() {
+    public String[] getGeneratorDataReadFields() {
         return this.generatorDataReadFields;
     }
 
@@ -83,7 +83,7 @@ public class PsseContext {
         this.nonTransformerBranchDataReadFields = fields;
     }
 
-    String[] getNonTransformerBranchDataReadFields() {
+    public String[] getNonTransformerBranchDataReadFields() {
         return this.nonTransformerBranchDataReadFields;
     }
 
@@ -115,7 +115,7 @@ public class PsseContext {
         this.areaInterchangeDataReadFields = fields;
     }
 
-    String[] getAreaInterchangeDataReadFields() {
+    public String[] getAreaInterchangeDataReadFields() {
         return this.areaInterchangeDataReadFields;
     }
 
@@ -123,7 +123,7 @@ public class PsseContext {
         this.zoneDataReadFields = fields;
     }
 
-    String[] getZoneDataReadFields() {
+    public String[] getZoneDataReadFields() {
         return this.zoneDataReadFields;
     }
 
@@ -131,7 +131,7 @@ public class PsseContext {
         this.ownerDataReadFields = fields;
     }
 
-    String[] getOwnerDataReadFields() {
+    public String[] getOwnerDataReadFields() {
         return this.ownerDataReadFields;
     }
 
@@ -139,7 +139,7 @@ public class PsseContext {
         this.switchedShuntDataReadFields = fields;
     }
 
-    String[] getSwitchedShuntDataReadFields() {
+    public String[] getSwitchedShuntDataReadFields() {
         return this.switchedShuntDataReadFields;
     }
 }

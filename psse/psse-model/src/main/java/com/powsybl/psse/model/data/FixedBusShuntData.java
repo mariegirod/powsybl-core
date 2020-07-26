@@ -8,6 +8,7 @@ package com.powsybl.psse.model.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseFixedShunt;
+import com.powsybl.psse.model.PsseRawModel;
 
 /**
  *
@@ -57,11 +59,29 @@ class FixedBusShuntData extends BlockData {
         return parseRecordsHeader(records, PsseFixedShunt.class, headers);
     }
 
+    void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
+        assertMinimumExpectedVersion(PsseBlockData.FixedBusShuntData, PsseVersion.VERSION_33);
+
+        String[] headers = context.getFixedBusShuntDataReadFields();
+        BlockData.<PsseFixedShunt>writeBlock(PsseFixedShunt.class, model.getFixedShunts(), headers,
+            BlockData.quoteFieldsInsideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
+            context.getDelimiter().charAt(0), outputStream);
+        BlockData.writeEndOfBlockAndComment("END OF FIXED SHUNT DATA, BEGIN GENERATOR DATA", outputStream);
+    }
+
     static String[] fixedBusShuntDataHeaders(PsseVersion version) {
         if (version == PsseVersion.VERSION_35) {
             return new String[] {"ibus", "shntid", "stat", "gl", "bl"};
         } else {
             return new String[] {"i", "id", "status", "gl", "bl"};
+        }
+    }
+
+    static String[] fixedBusShuntDataQuoteFields(PsseVersion version) {
+        if (version == PsseVersion.VERSION_35) {
+            return new String[] {"shntid"};
+        } else {
+            return new String[] {"id"};
         }
     }
 }
