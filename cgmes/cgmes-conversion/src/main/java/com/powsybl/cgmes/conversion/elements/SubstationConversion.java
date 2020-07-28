@@ -53,7 +53,6 @@ public class SubstationConversion extends AbstractIdentifiedObjectConversion {
                 .setName(iidmName())
                 .setEnsureIdUnicity(false)
                 .setCountry(country)
-                .setGeographicalTags(geoTag)
                 .add();
     }
 }
