@@ -98,7 +98,7 @@ public class JsonModel {
         public List<RawString> getData() {
             return this.data;
         }
-        
+
         private static List<RawString> createRawStringList(List<String> stringList) {
             List<RawString> rawList = new ArrayList<>();
             stringList.forEach(s -> rawList.add(new RawString("[" + s + "]")));
@@ -127,4 +127,4 @@ public class JsonModel {
             return this.data;
         }
     }
-  }
+}
