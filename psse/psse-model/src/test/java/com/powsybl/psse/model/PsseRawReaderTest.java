@@ -8,7 +8,6 @@ package com.powsybl.psse.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
-import com.powsybl.commons.datasource.FileDataSource;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -305,8 +302,8 @@ public class PsseRawReaderTest {
             PsseRawModel rawData = psseRawReader.read(reader, context);
             assertNotNull(rawData);
 
-            Path out = Paths.get("\\work\\tmp");
-            psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_export.raw"));
+            //Path out = Paths.get("\\work\\tmp");
+            //psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_export.raw"));
         }
     }
 
@@ -318,8 +315,8 @@ public class PsseRawReaderTest {
             PsseRawModel rawData = psseRawReader.read(reader, context);
             assertNotNull(rawData);
 
-            Path out = Paths.get("\\work\\tmp");
-            psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev35_export.raw"));
+            //Path out = Paths.get("\\work\\tmp");
+            //psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev35_export.raw"));
         }
     }
 
@@ -332,8 +329,8 @@ public class PsseRawReaderTest {
         PsseRawModel rawData = psseRawReader.readx(jsonFile, context);
         assertNotNull(rawData);
 
-        Path out = Paths.get("\\work\\tmp");
-        psseRawReader.writex(rawData, context, new FileDataSource(out, "IEEE_14_bus_export.rawx"));
+        //Path out = Paths.get("\\work\\tmp");
+        //psseRawReader.writex(rawData, context, new FileDataSource(out, "IEEE_14_bus_export.rawx"));
     }
 
     private boolean compareReadFields(String[] expected, String[] actual) {
