@@ -22,6 +22,7 @@ import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseException;
 import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseRawModel35;
+import com.powsybl.psse.model.data.JsonModel.JsonNetwork;
 
 /**
  *
@@ -32,7 +33,7 @@ public class PsseData {
 
     public boolean checkCase(BufferedReader reader) throws IOException {
 
-     // CaseIdentification does not change, so it is read using version 33
+        // CaseIdentification does not change, so it is read using version 33
         PsseVersion version = PsseVersion.VERSION_33;
 
         // just check the first record if this file is in PSS/E format
@@ -280,5 +281,18 @@ public class PsseData {
         BlockData.writeEndOfBlockAndComment("END OF SUBSTATION DATA", outputStream);
 
         BlockData.writeQrecord(outputStream);
+    }
+
+    public void writex(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
+        PsseVersion version = PsseVersion.VERSION_35;
+        PsseFileFormat format = PsseFileFormat.FORMAT_RAWX;
+
+        JsonNetwork network = new JsonNetwork();
+
+        network.setBus(new BusData(version, format).writex(model, context));
+        network.setLoad(new LoadData(version, format).writex(model, context));
+
+        JsonModel jsonModel = new JsonModel(network);
+        BlockData.writexJsonModel(jsonModel, outputStream);
     }
 }

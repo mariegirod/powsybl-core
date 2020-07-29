@@ -67,4 +67,16 @@ public class PsseRawReader {
 
         bufferedOutputStream.close();
     }
+
+    public void writex(PsseRawModel model, PsseContext context, DataSource dataSource) throws IOException {
+        Objects.requireNonNull(model);
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(dataSource);
+
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "csv", false));
+        new PsseData().writex(model, context, bufferedOutputStream);
+
+        bufferedOutputStream.close();
+    }
+
 }
