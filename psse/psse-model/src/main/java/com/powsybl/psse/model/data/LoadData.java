@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
-import com.powsybl.psse.model.data.JsonModel.NetworkBlockData;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseLoad;
 import com.powsybl.psse.model.PsseLoad35;
@@ -89,7 +89,7 @@ class LoadData extends BlockData {
         BlockData.writeEndOfBlockAndComment("END OF LOAD DATA, BEGIN FIXED SHUNT DATA", outputStream);
     }
 
-    NetworkBlockData writex(PsseRawModel model, PsseContext context) throws IOException {
+    TableData writex(PsseRawModel model, PsseContext context) {
         assertMinimumExpectedVersion(PsseBlockData.LOAD_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         String[] headers = context.getLoadDataReadFields();
@@ -100,7 +100,7 @@ class LoadData extends BlockData {
             BlockData.quoteFieldsInsideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0));
 
-        return new NetworkBlockData(headers, stringList);
+        return new TableData(headers, stringList);
     }
 
     private static String[] loadDataHeaders(PsseVersion version) {

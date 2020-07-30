@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseGenerator;
 import com.powsybl.psse.model.PsseGenerator35;
@@ -87,6 +88,20 @@ class GeneratorData extends BlockData {
         }
 
         BlockData.writeEndOfBlockAndComment("END OF GENERATOR DATA, BEGIN BRANCH DATA", outputStream);
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.GENERATOR_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getGeneratorDataReadFields();
+        List<PsseGenerator35> generator35List = model.getGenerators().stream()
+            .map(m -> (PsseGenerator35) m).collect(Collectors.toList()); // TODO improve
+
+        List<String> stringList = BlockData.<PsseGenerator35>writexBlock(PsseGenerator35.class, generator35List, headers,
+            BlockData.quoteFieldsInsideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers),
+            context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] generatorDataHeaders(PsseVersion version) {

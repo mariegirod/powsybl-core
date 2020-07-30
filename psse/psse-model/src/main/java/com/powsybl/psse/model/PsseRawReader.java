@@ -62,7 +62,7 @@ public class PsseRawReader {
         Objects.requireNonNull(context);
         Objects.requireNonNull(dataSource);
 
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "csv", false));
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "raw", false));
         new PsseData().write(model, context, bufferedOutputStream);
 
         bufferedOutputStream.close();
@@ -73,7 +73,7 @@ public class PsseRawReader {
         Objects.requireNonNull(context);
         Objects.requireNonNull(dataSource);
 
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "csv", false));
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(dataSource.newOutputStream(null, "rawx", false));
         new PsseData().writex(model, context, bufferedOutputStream);
 
         bufferedOutputStream.close();

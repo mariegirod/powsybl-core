@@ -18,7 +18,7 @@ import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseRawModel;
-import com.powsybl.psse.model.data.JsonModel.NetworkBlockData;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 
 /**
  *
@@ -70,14 +70,14 @@ class BusData extends BlockData {
         BlockData.writeEndOfBlockAndComment("END OF BUS DATA, BEGIN LOAD DATA", outputStream);
     }
 
-    NetworkBlockData writex(PsseRawModel model, PsseContext context) throws IOException {
+    TableData writex(PsseRawModel model, PsseContext context) {
         assertMinimumExpectedVersion(PsseBlockData.BUS_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
         String[] headers = context.getBusDataReadFields();
         List<String> stringList = BlockData.<PsseBus>writexBlock(PsseBus.class, model.getBuses(), headers,
             BlockData.quoteFieldsInsideHeaders(busDataQuoteFields(), headers), context.getDelimiter().charAt(0));
 
-        return new NetworkBlockData(headers, stringList);
+        return new TableData(headers, stringList);
     }
 
     private static String[] busDataHeaders(PsseVersion version) {

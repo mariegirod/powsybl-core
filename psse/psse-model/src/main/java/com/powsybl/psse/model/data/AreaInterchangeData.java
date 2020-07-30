@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseArea;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseRawModel;
 
@@ -67,6 +68,17 @@ class AreaInterchangeData extends BlockData {
             BlockData.quoteFieldsInsideHeaders(areaInterchangeDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF AREA DATA, BEGIN TWO-TERMINAL DC DATA", outputStream);
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.AREA_INTERCHANGE_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getAreaInterchangeDataReadFields();
+        List<String> stringList = BlockData.<PsseArea>writexBlock(PsseArea.class, model.getAreas(), headers,
+            BlockData.quoteFieldsInsideHeaders(areaInterchangeDataQuoteFields(), headers),
+            context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] areaInterchangeDataHeaders(PsseVersion version) {

@@ -15,6 +15,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseFixedShunt;
 import com.powsybl.psse.model.PsseRawModel;
@@ -67,6 +68,17 @@ class FixedBusShuntData extends BlockData {
             BlockData.quoteFieldsInsideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0), outputStream);
         BlockData.writeEndOfBlockAndComment("END OF FIXED SHUNT DATA, BEGIN GENERATOR DATA", outputStream);
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.FIXED_BUS_SHUNT_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getFixedBusShuntDataReadFields();
+        List<String> stringList = BlockData.<PsseFixedShunt>writexBlock(PsseFixedShunt.class, model.getFixedShunts(), headers,
+            BlockData.quoteFieldsInsideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
+            context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     static String[] fixedBusShuntDataHeaders(PsseVersion version) {

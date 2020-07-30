@@ -12,7 +12,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.powsybl.psse.model.data.JsonModel.RawString;
 
 /**
  *
@@ -30,101 +29,146 @@ public class JsonModel {
         return this.network;
     }
 
-    @JsonPropertyOrder({"caseid", "bus", "load", "generator", "acline"})
+    @JsonPropertyOrder({"caseid", "bus", "load", "fixshunt", "generator", "acline"})
     public static class JsonNetwork {
-        private NetworkBlockData caseid;
-        private NetworkBlockData bus;
-        private NetworkBlockData load;
-        private NetworkBlockData generator;
-        private NetworkBlockData acline;
+        private ArrayData caseid;
+        private TableData bus;
+        private TableData load;
+        private TableData fixshunt;
+        private TableData generator;
+        private TableData acline;
+        private TableData area;
+        private TableData zone;
+        private TableData owner;
 
-        void setCaseid(NetworkBlockData caseid) {
+        void setCaseid(ArrayData caseid) {
             this.caseid = caseid;
         }
 
-        public NetworkBlockData getCaseid() {
+        public ArrayData getCaseid() {
             return this.caseid;
         }
 
-        void setBus(NetworkBlockData bus) {
+        void setBus(TableData bus) {
             this.bus = bus;
         }
 
-        public NetworkBlockData getBus() {
+        public TableData getBus() {
             return this.bus;
         }
 
-        void setLoad(NetworkBlockData load) {
+        void setLoad(TableData load) {
             this.load = load;
         }
 
-        public NetworkBlockData getLoad() {
+        public TableData getLoad() {
             return this.load;
         }
 
-        void setGenerator(NetworkBlockData generator) {
+        void setFixshunt(TableData fixshunt) {
+            this.fixshunt = fixshunt;
+        }
+
+        public TableData getFixshunt() {
+            return this.fixshunt;
+        }
+
+        void setGenerator(TableData generator) {
             this.generator = generator;
         }
 
-        public NetworkBlockData getGenerator() {
+        public TableData getGenerator() {
             return this.generator;
         }
 
-        void setAcline(NetworkBlockData acline) {
+        void setAcline(TableData acline) {
             this.acline = acline;
         }
 
-        public NetworkBlockData getAcline() {
+        public TableData getAcline() {
             return this.acline;
+        }
+
+        void setArea(TableData area) {
+            this.area = area;
+        }
+
+        public TableData getArea() {
+            return this.area;
+        }
+
+        void setZone(TableData zone) {
+            this.zone = zone;
+        }
+
+        public TableData getZone() {
+            return this.zone;
+        }
+
+        void setOwner(TableData owner) {
+            this.owner = owner;
+        }
+
+        public TableData getOwner() {
+            return this.owner;
         }
     }
 
     @JsonPropertyOrder({"fields", "data"})
-    public static class NetworkBlockData {
+    public static class TableData {
         @JsonRawValue
         @JsonProperty("fields")
         private final List<String> quotedFields;
-        private final List<RawString> data;
+        private final List<String> data;
 
-        NetworkBlockData(String[] fields, List<String> data) {
-            this.quotedFields = quotexFields(fields);
-            this.data = createRawStringList(data);
+        TableData(String[] fields, List<String> data) {
+            this.quotedFields = addQuote(fields);
+            this.data = addSquareBrakets(data);
         }
 
         public List<String> getQuotedFields() {
             return this.quotedFields;
         }
 
-        public List<RawString> getData() {
+        public List<String> getData() {
             return this.data;
         }
 
-        private static List<RawString> createRawStringList(List<String> stringList) {
-            List<RawString> rawList = new ArrayList<>();
-            stringList.forEach(s -> rawList.add(new RawString("[" + s + "]")));
+        private static List<String> addSquareBrakets(List<String> stringList) {
+            List<String> rawList = new ArrayList<>();
+            stringList.forEach(s -> rawList.add("[" + s + "]"));
             return rawList;
-        }
-
-        private static List<String> quotexFields(String[] fields) {
-            List<String> list = new ArrayList<>();
-
-            for (int i = 0; i < fields.length; i++) {
-                list.add("\"" + fields[i] + "\"");
-            }
-            return list;
         }
     }
 
-    public static class RawString {
+    @JsonPropertyOrder({"fields", "data"})
+    public static class ArrayData {
         @JsonRawValue
-        private final String data;
+        @JsonProperty("fields")
+        private final List<String> quotedFields;
+        @JsonRawValue
+        private final List<String> data;
 
-        RawString(String data) {
+        ArrayData(String[] fields, List<String> data) {
+            this.quotedFields = addQuote(fields);
             this.data = data;
         }
 
-        public String getData() {
+        public List<String> getQuotedFields() {
+            return this.quotedFields;
+        }
+
+        public List<String> getData() {
             return this.data;
         }
+    }
+
+    private static List<String> addQuote(String[] fields) {
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < fields.length; i++) {
+            list.add("\"" + fields[i] + "\"");
+        }
+        return list;
     }
 }

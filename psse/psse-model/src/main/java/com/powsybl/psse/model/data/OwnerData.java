@@ -15,6 +15,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseOwner;
 import com.powsybl.psse.model.PsseRawModel;
@@ -67,6 +68,16 @@ class OwnerData extends BlockData {
             BlockData.quoteFieldsInsideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF OWNER DATA, BEGIN FACTS CONTROL DEVICE DATA", outputStream);
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.OWNER_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getOwnerDataReadFields();
+        List<String> stringList = BlockData.<PsseOwner>writexBlock(PsseOwner.class, model.getOwners(), headers,
+            BlockData.quoteFieldsInsideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] ownerDataHeaders(PsseVersion version) {

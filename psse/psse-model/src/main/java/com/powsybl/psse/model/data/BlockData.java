@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -31,7 +30,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
 import com.powsybl.psse.model.PsseException;
-import com.powsybl.psse.model.data.JsonModel.RawString;
 import com.univocity.parsers.common.DataProcessingException;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.RetryableErrorHandler;
@@ -150,21 +148,21 @@ class BlockData {
     static <T> void writeBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
         char delimiter, OutputStream outputStream) {
 
-        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter);
+        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter, '\'');
         CsvWriter writer = new CsvWriter(outputStream, settings);
         writer.processRecords(modelRecords);
         writer.flush();
     }
 
     private static <T> CsvWriterSettings writeBlockSettings(Class<T> aClass, String[] headers,
-        String[] quoteFields, char delimiter) {
+        String[] quoteFields, char delimiter, char quote) {
 
         BeanWriterProcessor<T> processor = new BeanWriterProcessor<>(aClass);
 
         CsvWriterSettings settings = new CsvWriterSettings();
         settings.quoteFields(quoteFields);
         settings.setHeaders(headers);
-        settings.getFormat().setQuote('\'');
+        settings.getFormat().setQuote(quote);
         settings.getFormat().setDelimiter(delimiter);
         settings.setIgnoreLeadingWhitespaces(false);
         settings.setIgnoreTrailingWhitespaces(false);
@@ -215,21 +213,19 @@ class BlockData {
     static <T> List<String> writexBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
         char delimiter) {
 
-        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter);
+        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter, '"');
         CsvWriter writer = new CsvWriter(settings);
         return writer.processRecordsToString(modelRecords);
     }
 
-    public static void writexJsonModel(JsonModel jsonModel, OutputStream outputStream) throws IOException {
+    public static String writexJsonModel(JsonModel jsonModel) throws IOException {
         DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
         prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configOverride(RawString.class).setFormat(JsonFormat.Value.forShape(JsonFormat.Shape.ARRAY));
-        objectMapper.configure(SerializationFeature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED, true);
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         objectMapper.setSerializationInclusion(Include.NON_NULL);
-        objectMapper.writer(prettyPrinter).writeValue(outputStream, jsonModel);
+        return objectMapper.writer(prettyPrinter).writeValueAsString(jsonModel);
     }
 
     // Read

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseNonTransformerBranch;
 import com.powsybl.psse.model.PsseNonTransformerBranch35;
@@ -80,12 +81,30 @@ class NonTransformerBranchData extends BlockData {
 
             BlockData.<PsseNonTransformerBranch35>writeBlock(PsseNonTransformerBranch35.class, nonTransformerBranch35List,
                 headers, quoteFields, context.getDelimiter().charAt(0), outputStream);
+
+            BlockData.writeEndOfBlockAndComment("END OF BRANCH DATA, BEGIN SYSTEM SWITCHING DEVICE DATA", outputStream);
         } else {
             BlockData.<PsseNonTransformerBranch>writeBlock(PsseNonTransformerBranch.class, model.getNonTransformerBranches(),
                 headers, quoteFields, context.getDelimiter().charAt(0), outputStream);
-        }
 
-        BlockData.writeEndOfBlockAndComment("END OF BRANCH DATA, BEGIN TRANSFORMER DATA", outputStream);
+            BlockData.writeEndOfBlockAndComment("END OF BRANCH DATA, BEGIN TRANSFORMER DATA", outputStream);
+        }
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.NON_TRANSFORMER_BRANCH_DATA, PsseVersion.VERSION_35,
+            PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getNonTransformerBranchDataReadFields();
+        List<PsseNonTransformerBranch35> nonTransformerBranch35List = model.getNonTransformerBranches().stream()
+            .map(m -> (PsseNonTransformerBranch35) m).collect(Collectors.toList()); // TODO improve
+
+        List<String> stringList = BlockData.<PsseNonTransformerBranch35>writexBlock(PsseNonTransformerBranch35.class,
+            nonTransformerBranch35List, headers,
+            BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers),
+            context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] nonTransformerBranchDataHeaders(PsseVersion version) {

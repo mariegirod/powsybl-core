@@ -15,6 +15,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseZone;
@@ -67,6 +68,16 @@ class ZoneData extends BlockData {
             BlockData.quoteFieldsInsideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF ZONE DATA, BEGIN INTER-AREA TRANSFER DATA", outputStream);
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.ZONE_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getZoneDataReadFields();
+        List<String> stringList = BlockData.<PsseZone>writexBlock(PsseZone.class, model.getZones(), headers,
+            BlockData.quoteFieldsInsideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] zoneDataHeaders(PsseVersion version) {

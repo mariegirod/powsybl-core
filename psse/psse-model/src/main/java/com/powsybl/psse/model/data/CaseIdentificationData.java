@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseCaseIdentification;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.ArrayData;
 import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseException;
 import com.powsybl.psse.model.PsseRawModel;
@@ -124,6 +125,20 @@ class CaseIdentificationData extends BlockData {
         writeStringLine(model.getCaseIdentification().getTitle2(), outputStream);
     }
 
+    ArrayData writex(PsseRawModel model, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.CASE_IDENTIFICATION_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        String[] headers = context.getCaseIdentificationDataReadFields();
+        List<PsseCaseIdentification> caseIdentificationList = new ArrayList<>();
+        caseIdentificationList.add(model.getCaseIdentification());
+
+        List<String> stringList = BlockData.<PsseCaseIdentification>writexBlock(PsseCaseIdentification.class,
+            caseIdentificationList, headers, BlockData.quoteFieldsInsideHeaders(caseIdentificationDataQuoteFields(), headers),
+            context.getDelimiter().charAt(0));
+
+        return new ArrayData(headers, stringList);
+    }
+
     private static String[] caseIdentificationDataHeaders(int firstRecordFields) {
         String[] first = new String[] {"ic", "sbase", "rev", "xfrrat", "nxfrat", "basfrq"};
         return ArrayUtils.addAll(ArrayUtils.subarray(first, 0, firstRecordFields), "title1", "title2");
@@ -134,7 +149,7 @@ class CaseIdentificationData extends BlockData {
     }
 
     private static String[] caseIdentificationDataQuoteFields() {
-        return new String[] {};
+        return new String[] {"title1", "title2"};
     }
 
     private static String[] caseIdentificationDataExcludedFields() {

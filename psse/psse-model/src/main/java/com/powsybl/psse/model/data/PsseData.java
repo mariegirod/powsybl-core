@@ -9,8 +9,10 @@ package com.powsybl.psse.model.data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,11 +66,7 @@ public class PsseData {
         int rev = caseIdentification.getRev();
         double basfrq = caseIdentification.getBasfrq();
 
-        if (ic == 0 && sbase > 0. && ArrayUtils.contains(PsseConstants.SUPPORTED_VERSIONS, rev) && basfrq > 0.) {
-            return true;
-        }
-
-        return false;
+        return ic == 0 && sbase > 0. && ArrayUtils.contains(PsseConstants.SUPPORTED_VERSIONS, rev) && basfrq > 0.0;
     }
 
     public PsseRawModel read(BufferedReader reader, PsseContext context) throws IOException {
@@ -202,7 +200,7 @@ public class PsseData {
     }
 
     // write
-    public void write(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
+    public void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
         if (model.getCaseIdentification().getRev() == 33) {
             write33(model, context, outputStream);
         } else if (model.getCaseIdentification().getRev() == 35) {
@@ -212,53 +210,44 @@ public class PsseData {
         }
     }
 
-    public void write33(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
+    public void write33(PsseRawModel model, PsseContext context, OutputStream outputStream) {
         PsseVersion version = PsseVersion.VERSION_33;
 
         new CaseIdentificationData(version).write(model, context, outputStream);
-        new BusData(version).write(model, context, outputStream);
-        new LoadData(version).write(model, context, outputStream);
-        new FixedBusShuntData(version).write(model, context, outputStream);
-        new GeneratorData(version).write(model, context, outputStream);
-        new NonTransformerBranchData(version).write(model, context, outputStream);
-        new TransformerData(version).write(model, context, outputStream);
-        new AreaInterchangeData(version).write(model, context, outputStream);
+        writeBlocksA(model, version, context, outputStream);
+        writeBlocksB(model, version, context, outputStream);
 
-        BlockData.writeEndOfBlockAndComment("END OF TWO-TERMINAL DC DATA, BEGIN VOLTAGE SOURCE CONVERTER DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF VOLTAGE SOURCE CONVERTER DATA, BEGIN IMPEDANCE CORRECTION DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF IMPEDANCE CORRECTION DATA, BEGIN MULTI-TERMINAL DC DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF MULTI-TERMINAL DC DATA, BEGIN MULTI-SECTION LINE DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF MULTI-SECTION LINE DATA, BEGIN ZONE DATA", outputStream);
-
-        new ZoneData(version).write(model, context, outputStream);
-
-        BlockData.writeEndOfBlockAndComment("END OF INTER-AREA TRANSFER DATA, BEGIN OWNER DATA", outputStream);
-
-        new OwnerData(version).write(model, context, outputStream);
-
-        BlockData.writeEndOfBlockAndComment("END OF FACTS CONTROL DEVICE DATA, BEGIN SWITCHED SHUNT DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF SWITCHED SHUNT DATA, BEGIN GNE DEVICE DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF INDUCTION MACHINE DATA", outputStream);
-
         BlockData.writeQrecord(outputStream);
     }
 
-    public void write35(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
+    public void write35(PsseRawModel model, PsseContext context, OutputStream outputStream) {
         PsseVersion version = PsseVersion.VERSION_35;
 
         new CaseIdentificationData(version).write(model, context, outputStream);
 
         BlockData.writeEndOfBlockAndComment("END OF SYSTEM-WIDE DATA, BEGIN BUS DATA", outputStream);
 
+        writeBlocksA(model, version, context, outputStream);
+
+        BlockData.writeEndOfBlockAndComment("END OF SYSTEM SWITCHING DEVICE DATA, BEGIN TRANSFORMER DATA", outputStream);
+
+        writeBlocksB(model, version, context, outputStream);
+
+        BlockData.writeEndOfBlockAndComment("END OF INDUCTION MACHINE DATA, BEGIN SUBSTATION DATA", outputStream);
+        BlockData.writeEndOfBlockAndComment("END OF SUBSTATION DATA", outputStream);
+        BlockData.writeQrecord(outputStream);
+    }
+
+    public void writeBlocksA(PsseRawModel model, PsseVersion version, PsseContext context, OutputStream outputStream) {
         new BusData(version).write(model, context, outputStream);
         new LoadData(version).write(model, context, outputStream);
         new FixedBusShuntData(version).write(model, context, outputStream);
         new GeneratorData(version).write(model, context, outputStream);
         new NonTransformerBranchData(version).write(model, context, outputStream);
+    }
 
-        BlockData.writeEndOfBlockAndComment("END OF BRANCH DATA, BEGIN SYSTEM SWITCHING DEVICE DATA", outputStream);
-
+    public void writeBlocksB(PsseRawModel model, PsseVersion version, PsseContext context, OutputStream outputStream) {
         new TransformerData(version).write(model, context, outputStream);
         new AreaInterchangeData(version).write(model, context, outputStream);
 
@@ -277,10 +266,6 @@ public class PsseData {
         BlockData.writeEndOfBlockAndComment("END OF FACTS CONTROL DEVICE DATA, BEGIN SWITCHED SHUNT DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF SWITCHED SHUNT DATA, BEGIN GNE DEVICE DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF INDUCTION MACHINE DATA, BEGIN SUBSTATION DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF SUBSTATION DATA", outputStream);
-
-        BlockData.writeQrecord(outputStream);
     }
 
     public void writex(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
@@ -289,10 +274,21 @@ public class PsseData {
 
         JsonNetwork network = new JsonNetwork();
 
+        network.setCaseid(new CaseIdentificationData(version, format).writex(model, context));
         network.setBus(new BusData(version, format).writex(model, context));
         network.setLoad(new LoadData(version, format).writex(model, context));
+        network.setFixshunt(new FixedBusShuntData(version, format).writex(model, context));
+        network.setGenerator(new GeneratorData(version, format).writex(model, context));
+        network.setAcline(new NonTransformerBranchData(version, format).writex(model, context));
+
+        network.setArea(new AreaInterchangeData(version, format).writex(model, context));
+        network.setZone(new ZoneData(version, format).writex(model, context));
+        network.setOwner(new OwnerData(version, format).writex(model, context));
 
         JsonModel jsonModel = new JsonModel(network);
-        BlockData.writexJsonModel(jsonModel, outputStream);
+        String json = BlockData.writexJsonModel(jsonModel);
+        String adjustedJson = StringUtils.replaceEach(json, new String[] {"\"[", "]\"", "\\\""}, new String[] {"[", "]", "\""});
+        outputStream.write(adjustedJson.getBytes(StandardCharsets.UTF_8));
+        outputStream.flush();
     }
 }
