@@ -132,7 +132,7 @@ public class JsonModel {
 
         TableData(String[] fields, List<String> data) {
             this.quotedFields = addQuote(fields);
-            this.data = addSquareBrakets(data);
+            this.data = addSquareBrackets(data);
         }
 
         public List<String> getQuotedFields() {
@@ -143,10 +143,10 @@ public class JsonModel {
             return this.data;
         }
 
-        private static List<String> addSquareBrakets(List<String> stringList) {
-            List<String> rawList = new ArrayList<>();
-            stringList.forEach(s -> rawList.add("[" + s + "]"));
-            return rawList;
+        private static List<String> addSquareBrackets(List<String> stringList) {
+            List<String> bracketList = new ArrayList<>();
+            stringList.forEach(s -> bracketList.add("[" + s + "]"));
+            return bracketList;
         }
     }
 
