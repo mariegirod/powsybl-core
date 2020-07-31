@@ -29,7 +29,6 @@ public class JsonModel {
         return this.network;
     }
 
-    @JsonPropertyOrder({"caseid", "bus", "load", "fixshunt", "generator", "acline", "transformer", "area", "zone", "owner"})
     public static class JsonNetwork {
         private ArrayData caseid;
         private TableData bus;
