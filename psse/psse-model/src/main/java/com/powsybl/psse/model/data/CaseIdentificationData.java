@@ -119,10 +119,10 @@ class CaseIdentificationData extends BlockData {
         caseIdentificationList.add(model.getCaseIdentification());
 
         BlockData.<PsseCaseIdentification>writeBlock(PsseCaseIdentification.class, caseIdentificationList, headers,
-            BlockData.quoteFieldsInsideHeaders(caseIdentificationDataQuoteFields(), headers),
+            BlockData.insideHeaders(caseIdentificationDataQuoteFields(), headers),
             context.getDelimiter().charAt(0), outputStream);
-        writeStringLine(model.getCaseIdentification().getTitle1(), outputStream);
-        writeStringLine(model.getCaseIdentification().getTitle2(), outputStream);
+        writeString(model.getCaseIdentification().getTitle1(), outputStream);
+        writeString(model.getCaseIdentification().getTitle2(), outputStream);
     }
 
     ArrayData writex(PsseRawModel model, PsseContext context) {
@@ -133,7 +133,7 @@ class CaseIdentificationData extends BlockData {
         caseIdentificationList.add(model.getCaseIdentification());
 
         List<String> stringList = BlockData.<PsseCaseIdentification>writexBlock(PsseCaseIdentification.class,
-            caseIdentificationList, headers, BlockData.quoteFieldsInsideHeaders(caseIdentificationDataQuoteFields(), headers),
+            caseIdentificationList, headers, BlockData.insideHeaders(caseIdentificationDataQuoteFields(), headers),
             context.getDelimiter().charAt(0));
 
         return new ArrayData(headers, stringList);

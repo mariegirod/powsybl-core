@@ -11,13 +11,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.powsybl.psse.model.PsseConstants.PsseFileFormat;
 import com.powsybl.psse.model.PsseConstants.PsseVersion;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 import com.powsybl.psse.model.PsseContext;
+import com.powsybl.psse.model.PsseException;
 import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseTransformer;
 import com.powsybl.psse.model.PsseTransformer35;
@@ -146,13 +149,143 @@ class TransformerData extends BlockData {
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
         assertMinimumExpectedVersion(PsseBlockData.TRANSFORMER_DATA, PsseVersion.VERSION_33);
 
-        // String[] headers = context.getNonTransformerBranchDataReadFields();
-        // BlockData.<PsseTransformer>writeBlock(PsseTransformer.class,
-        // model.getTransformers(), headers,
-        // BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()),
-        // headers),
-        // context.getDelimiter().charAt(0), outputStream);
+        if (this.getPsseVersion() == PsseVersion.VERSION_35) {
+
+            List<PsseTransformer35> transformer35List2w = model.getTransformers().stream().filter(t -> t.getK() == 0)
+                .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+            if (!transformer35List2w.isEmpty()) {
+                String[] headers = context.get2wTransformerDataReadFields();
+                this.<PsseTransformer35>write(PsseTransformer35.class, transformer35List2w, headers, context, outputStream, true);
+            }
+
+            List<PsseTransformer35> transformer35List3w = model.getTransformers().stream().filter(t -> t.getK() != 0)
+                .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+            if (!transformer35List3w.isEmpty()) {
+                String[] headers = context.get3wTransformerDataReadFields();
+                this.<PsseTransformer35>write(PsseTransformer35.class, transformer35List3w, headers, context, outputStream, false);
+            }
+
+        } else {
+
+            List<PsseTransformer> transformerList2w = model.getTransformers().stream().filter(t -> t.getK() == 0)
+                .collect(Collectors.toList());
+            if (!transformerList2w.isEmpty()) {
+                String[] headers = context.get2wTransformerDataReadFields();
+
+                this.<PsseTransformer>write(PsseTransformer.class, transformerList2w, headers, context, outputStream, true);
+            }
+
+            List<PsseTransformer> transformerList3w = model.getTransformers().stream().filter(t -> t.getK() != 0)
+                .collect(Collectors.toList());
+            if (!transformerList3w.isEmpty()) {
+                String[] headers = context.get3wTransformerDataReadFields();
+                this.<PsseTransformer>write(PsseTransformer.class, transformerList3w, headers, context, outputStream, false);
+            }
+
+        }
+    }
+
+    private <T> void write(Class<T> aClass, List<T> transformerRecords, String[] headers, PsseContext context,
+        OutputStream outputStream, boolean is2w) {
+
+        String[] headers1 = BlockData.insideHeaders(transformerRecord1DataHeaders(this.getPsseVersion()), headers);
+        List<String> r1 = BlockData.<T>writeBlock(aClass, transformerRecords, headers1,
+            BlockData.insideHeaders(transformerDataQuoteFields(), headers1),
+            context.getDelimiter().charAt(0));
+
+        String[] headers2 = BlockData.insideHeaders(transformerRecord2DataHeaders(this.getPsseVersion()), headers);
+        List<String> r2 = BlockData.<T>writeBlock(aClass, transformerRecords, headers2,
+            BlockData.insideHeaders(transformerDataQuoteFields(), headers2),
+            context.getDelimiter().charAt(0));
+
+        String[] headers3 = BlockData.insideHeaders(transformerRecord3DataHeaders(this.getPsseVersion()), headers);
+        List<String> r3 = BlockData.<T>writeBlock(aClass, transformerRecords, headers3,
+            BlockData.insideHeaders(transformerDataQuoteFields(), headers3),
+            context.getDelimiter().charAt(0));
+
+        String[] headers4 = BlockData.insideHeaders(transformerRecord4DataHeaders(this.getPsseVersion()), headers);
+        List<String> r4 = BlockData.<T>writeBlock(aClass, transformerRecords, headers4,
+            BlockData.insideHeaders(transformerDataQuoteFields(), headers4),
+            context.getDelimiter().charAt(0));
+
+        if (is2w) {
+            write2wRecords(r1, r2, r3, r4, outputStream);
+        } else {
+            String[] headers5 = BlockData.insideHeaders(transformerRecord5DataHeaders(this.getPsseVersion()), headers);
+            List<String> r5 = BlockData.<T>writeBlock(aClass, transformerRecords, headers5,
+                BlockData.insideHeaders(transformerDataQuoteFields(), headers5),
+                context.getDelimiter().charAt(0));
+
+            write3wRecords(r1, r2, r3, r4, r5, outputStream);
+        }
+
         BlockData.writeEndOfBlockAndComment("END OF TRANSFORMER DATA, BEGIN AREA DATA", outputStream);
+    }
+
+    private static void write2wRecords(List<String> r1, List<String> r2, List<String> r3, List<String> r4,
+        OutputStream outputStream) {
+        if (r1.size() == r2.size() && r1.size() == r3.size() && r1.size() == r4.size()) {
+
+            List<String> mixList = new ArrayList<>();
+            for (int i = 0; i < r1.size(); i++) {
+                mixList.add(r1.get(i));
+                mixList.add(r2.get(i));
+                mixList.add(r3.get(i));
+                mixList.add(r4.get(i));
+            }
+            BlockData.writeListString(mixList, outputStream);
+        } else {
+            throw new PsseException("Psse: 2wTransformer. Transformer records do not match " +
+                String.format("%d %d %d %d", r1.size(), r2.size(), r3.size(), r4.size()));
+        }
+    }
+
+    private static void write3wRecords(List<String> r1, List<String> r2, List<String> r3, List<String> r4,
+        List<String> r5, OutputStream outputStream) {
+        if (r1.size() == r2.size() && r1.size() == r3.size() && r1.size() == r4.size() && r1.size() == r5.size()) {
+
+            List<String> mixList = new ArrayList<>();
+            for (int i = 0; i < r1.size(); i++) {
+                mixList.add(r1.get(i));
+                mixList.add(r2.get(i));
+                mixList.add(r3.get(i));
+                mixList.add(r4.get(i));
+                mixList.add(r5.get(i));
+            }
+            BlockData.writeListString(mixList, outputStream);
+        } else {
+            throw new PsseException("Psse: 3wTransformer. Transformer records do not match " +
+                String.format("%d %d %d %d %d", r1.size(), r2.size(), r3.size(), r4.size(), r5.size()));
+        }
+    }
+
+    TableData writex(PsseRawModel model, PsseContext context) {
+
+        List<PsseTransformer35> transformer35List2w = model.getTransformers().stream().filter(t -> t.getK() == 0)
+            .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+        if (!transformer35List2w.isEmpty()) {
+            String[] headers = context.get2wTransformerDataReadFields();
+            return writex(transformer35List2w, headers, context);
+        }
+
+        List<PsseTransformer35> transformer35List3w = model.getTransformers().stream().filter(t -> t.getK() != 0)
+            .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+        if (!transformer35List3w.isEmpty()) {
+            String[] headers = context.get3wTransformerDataReadFields();
+            return writex(transformer35List3w, headers, context);
+        }
+
+        return new TableData(new String[] {}, new ArrayList<String>());
+    }
+
+    TableData writex(List<PsseTransformer35> transformer35List, String[] headers, PsseContext context) {
+        assertMinimumExpectedVersion(PsseBlockData.TRANSFORMER_DATA, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
+
+        List<String> stringList = BlockData.<PsseTransformer35>writexBlock(PsseTransformer35.class, transformer35List, headers,
+            BlockData.insideHeaders(transformerDataQuoteFields(), headers),
+            context.getDelimiter().charAt(0));
+
+        return new TableData(headers, stringList);
     }
 
     private static String[] transformerDataHeaders(int record1Fields, int record2Fields, int record3Fields, int record4Fields, PsseVersion version) {
@@ -228,5 +361,9 @@ class TransformerData extends BlockData {
             return new String[] {"windv3", "nomv3", "ang3", "rata3", "ratb3", "ratc3", "cod3", "cont3", "rma3", "rmi3",
                 "vma3", "vmi3", "ntp3", "tab3", "cr3", "cx3", "cnxa3"};
         }
+    }
+
+    private static String[] transformerDataQuoteFields() {
+        return new String[] {"ckt", "name", "vecgrp"};
     }
 }

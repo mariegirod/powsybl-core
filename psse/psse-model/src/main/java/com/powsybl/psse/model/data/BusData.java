@@ -65,7 +65,7 @@ class BusData extends BlockData {
 
         String[] headers = context.getBusDataReadFields();
         BlockData.<PsseBus>writeBlock(PsseBus.class, model.getBuses(), headers,
-            BlockData.quoteFieldsInsideHeaders(busDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            BlockData.insideHeaders(busDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF BUS DATA, BEGIN LOAD DATA", outputStream);
     }
@@ -75,7 +75,7 @@ class BusData extends BlockData {
 
         String[] headers = context.getBusDataReadFields();
         List<String> stringList = BlockData.<PsseBus>writexBlock(PsseBus.class, model.getBuses(), headers,
-            BlockData.quoteFieldsInsideHeaders(busDataQuoteFields(), headers), context.getDelimiter().charAt(0));
+            BlockData.insideHeaders(busDataQuoteFields(), headers), context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);
     }

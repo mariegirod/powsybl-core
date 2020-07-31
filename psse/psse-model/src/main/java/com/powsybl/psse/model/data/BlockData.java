@@ -154,6 +154,14 @@ class BlockData {
         writer.flush();
     }
 
+    static <T> List<String> writeBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
+        char delimiter) {
+
+        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter, '\'');
+        CsvWriter writer = new CsvWriter(settings);
+        return writer.processRecordsToString(modelRecords);
+    }
+
     private static <T> CsvWriterSettings writeBlockSettings(Class<T> aClass, String[] headers,
         String[] quoteFields, char delimiter, char quote) {
 
@@ -172,42 +180,29 @@ class BlockData {
     }
 
     public static void writeEndOfBlock(OutputStream outputStream) {
-        CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
-        writer.addValue(0);
-        writer.writeValuesToRow();
-        writer.flush();
+        writeString("0", outputStream);
     }
 
-    // To avoid automatic quotes
     public static void writeEndOfBlockAndComment(String comment, OutputStream outputStream) {
-        CsvWriterSettings settings = new CsvWriterSettings();
-        settings.getFormat().setComment('0');
-        settings.setIgnoreLeadingWhitespaces(false);
-        settings.setIgnoreTrailingWhitespaces(false);
-        CsvWriter writer = new CsvWriter(outputStream, settings);
-        writer.commentRow(" / " + comment);
+        CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
+        writer.writeRow("0" + " / " + comment);
         writer.flush();
-    }
-
-    // To avoid automatic quotes
-    public static void writeStringLine(String line, OutputStream outputStream) {
-        if (line.isEmpty()) {
-            CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
-            writer.writeEmptyRow();
-            writer.flush();
-        } else {
-            CsvWriterSettings settings = new CsvWriterSettings();
-            settings.getFormat().setComment(line.charAt(0));
-            settings.setIgnoreLeadingWhitespaces(false);
-            settings.setIgnoreTrailingWhitespaces(false);
-            CsvWriter writer = new CsvWriter(outputStream, settings);
-            writer.commentRow(line.substring(1));
-            writer.flush();
-        }
     }
 
     public static void writeQrecord(OutputStream outputStream) {
-        writeStringLine("Q", outputStream);
+        writeString("Q", outputStream);
+    }
+
+    public static void writeListString(List<String> records, OutputStream outputStream) {
+        CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
+        records.forEach(writer::writeRow);
+        writer.flush();
+    }
+
+    public static void writeString(String line, OutputStream outputStream) {
+        CsvWriter writer = new CsvWriter(outputStream, new CsvWriterSettings());
+        writer.writeRow(line);
+        writer.flush();
     }
 
     static <T> List<String> writexBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
@@ -341,7 +336,7 @@ class BlockData {
 
     // Fields
 
-    static String[] quoteFieldsInsideHeaders(String[] quoteFields, String[] headers) {
+    static String[] insideHeaders(String[] quoteFields, String[] headers) {
         String[] quoteFieldsInside = new String[] {};
         for (int i = 0; i < quoteFields.length; i++) {
             if (ArrayUtils.contains(headers, quoteFields[i])) {

@@ -65,7 +65,7 @@ class AreaInterchangeData extends BlockData {
 
         String[] headers = context.getAreaInterchangeDataReadFields();
         BlockData.<PsseArea>writeBlock(PsseArea.class, model.getAreas(), headers,
-            BlockData.quoteFieldsInsideHeaders(areaInterchangeDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            BlockData.insideHeaders(areaInterchangeDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF AREA DATA, BEGIN TWO-TERMINAL DC DATA", outputStream);
     }
@@ -75,7 +75,7 @@ class AreaInterchangeData extends BlockData {
 
         String[] headers = context.getAreaInterchangeDataReadFields();
         List<String> stringList = BlockData.<PsseArea>writexBlock(PsseArea.class, model.getAreas(), headers,
-            BlockData.quoteFieldsInsideHeaders(areaInterchangeDataQuoteFields(), headers),
+            BlockData.insideHeaders(areaInterchangeDataQuoteFields(), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);

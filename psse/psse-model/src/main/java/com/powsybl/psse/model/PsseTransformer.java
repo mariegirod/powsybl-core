@@ -6,26 +6,30 @@
  */
 package com.powsybl.psse.model;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.univocity.parsers.annotations.Parsed;
-import com.univocity.parsers.annotations.Validate;
 
 /**
  *
  * @author Geoffroy Jamgotchian <geoffroy.jamgotchian at rte-france.com>
+ * @author Luma Zamarreño <zamarrenolm at aia.es>
+ * @author José Antonio Marqués <marquesja at aia.es>
  */
 
-// order using alphabetic order
-@JsonPropertyOrder(alphabetic = true)
+// order using alphabetic order, better field order
+//@JsonPropertyOrder(alphabetic = true)
+//
+//@validate annotation is incompatible with reading partially the fields for writing (export process).
+// If validated fields are not read then the validation fails and no records are returned
 
 public class PsseTransformer {
 
     @Parsed(field = {"i", "ibus"})
-    @Validate
+    //@Validate
     private int i;
 
-    @Parsed(field = {"j", "jbus"})
-    @Validate
+    @Parsed(field = { "j", "jbus" })
+    //@Validate
     private int j;
 
     @Parsed(field = {"k", "kbus"})
@@ -89,10 +93,9 @@ public class PsseTransformer {
     private double r12 = 0;
 
     @Parsed(field = {"x12", "x1_2"})
-    @Validate
     private double x12;
 
-    @Parsed(field = {"sbase12", "sabse1_2"})
+    @Parsed(field = {"sbase12", "sbase1_2"})
     private double sbase12 = Double.NaN;
 
     @Parsed(field = {"r23", "r2_3"})
@@ -528,16 +531,435 @@ public class PsseTransformer {
         this.anstar = anstar;
     }
 
+    // winding1
+
+    public double getWindv1() {
+        return this.windv1;
+    }
+
+    public void setWindv1(double windv1) {
+        this.windv1 = windv1;
+    }
+
+    public double getNomv1() {
+        return this.nomv1;
+    }
+
+    public void setNomv1(double nomv1) {
+        this.nomv1 = nomv1;
+    }
+
+    public double getAng1() {
+        return this.ang1;
+    }
+
+    public void setAng1(double ang1) {
+        this.ang1 = ang1;
+    }
+
+    public double getRata1() {
+        return this.rata1;
+    }
+
+    public void setRata1(double rata1) {
+        this.rata1 = rata1;
+    }
+
+    public double getRatb1() {
+        return this.ratb1;
+    }
+
+    public void setRatb1(double ratb1) {
+        this.ratb1 = ratb1;
+    }
+
+    public double getRatc1() {
+        return this.ratc1;
+    }
+
+    public void setRatc1(double ratc1) {
+        this.ratc1 = ratc1;
+    }
+
+    public int getCod1() {
+        return this.cod1;
+    }
+
+    public void setCod1(int cod1) {
+        this.cod1 = cod1;
+    }
+
+    public int getCont1() {
+        return this.cont1;
+    }
+
+    public void setCont1(int cont1) {
+        this.cont1 = cont1;
+    }
+
+    public double getRma1() {
+        return this.rma1;
+    }
+
+    public void setRma1(double rma1) {
+        this.rma1 = rma1;
+    }
+
+    public double getRmi1() {
+        return this.rmi1;
+    }
+
+    public void setRmi1(double rmi1) {
+        this.rmi1 = rmi1;
+    }
+
+    public double getVma1() {
+        return this.vma1;
+    }
+
+    public void setVma1(double vma1) {
+        this.vma1 = vma1;
+    }
+
+    public double getVmi1() {
+        return this.vmi1;
+    }
+
+    public void setVmi1(double vmi1) {
+        this.vmi1 = vmi1;
+    }
+
+    public int getNtp1() {
+        return this.ntp1;
+    }
+
+    public void setNtp1(int ntp1) {
+        this.ntp1 = ntp1;
+    }
+
+    public int getTab1() {
+        return this.tab1;
+    }
+
+    public void setTab1(int tab1) {
+        this.tab1 = tab1;
+    }
+
+    public double getCr1() {
+        return this.cr1;
+    }
+
+    public void setCr1(double cr1) {
+        this.cr1 = cr1;
+    }
+
+    public double getCx1() {
+        return this.cx1;
+    }
+
+    public void setCx1(double cx1) {
+        this.cx1 = cx1;
+    }
+
+    public double getCnxa1() {
+        return this.cnxa1;
+    }
+
+    public void setCnxa1(double cnxa1) {
+        this.cnxa1 = cnxa1;
+    }
+
+    // winding2
+
+    public double getWindv2() {
+        return this.windv2;
+    }
+
+    public void setWindv2(double windv2) {
+        this.windv2 = windv2;
+    }
+
+    public double getNomv2() {
+        return this.nomv2;
+    }
+
+    public void setNomv2(double nomv2) {
+        this.nomv2 = nomv2;
+    }
+
+    public double getAng2() {
+        return this.ang2;
+    }
+
+    public void setAng2(double ang2) {
+        this.ang2 = ang2;
+    }
+
+    public double getRata2() {
+        return this.rata2;
+    }
+
+    public void setRata2(double rata2) {
+        this.rata2 = rata2;
+    }
+
+    public double getRatb2() {
+        return this.ratb2;
+    }
+
+    public void setRatb2(double ratb2) {
+        this.ratb2 = ratb2;
+    }
+
+    public double getRatc2() {
+        return this.ratc2;
+    }
+
+    public void setRatc2(double ratc2) {
+        this.ratc2 = ratc2;
+    }
+
+    public int getCod2() {
+        return this.cod2;
+    }
+
+    public void setCod2(int cod2) {
+        this.cod2 = cod2;
+    }
+
+    public int getCont2() {
+        return this.cont2;
+    }
+
+    public void setCont2(int cont2) {
+        this.cont2 = cont2;
+    }
+
+    public double getRma2() {
+        return this.rma2;
+    }
+
+    public void setRma2(double rma2) {
+        this.rma2 = rma2;
+    }
+
+    public double getRmi2() {
+        return this.rmi2;
+    }
+
+    public void setRmi2(double rmi2) {
+        this.rmi2 = rmi2;
+    }
+
+    public double getVma2() {
+        return this.vma2;
+    }
+
+    public void setVma2(double vma2) {
+        this.vma2 = vma2;
+    }
+
+    public double getVmi2() {
+        return this.vmi2;
+    }
+
+    public void setVmi2(double vmi2) {
+        this.vmi2 = vmi2;
+    }
+
+    public int getNtp2() {
+        return this.ntp2;
+    }
+
+    public void setNtp2(int ntp2) {
+        this.ntp2 = ntp2;
+    }
+
+    public int getTab2() {
+        return this.tab2;
+    }
+
+    public void setTab2(int tab2) {
+        this.tab2 = tab2;
+    }
+
+    public double getCr2() {
+        return this.cr2;
+    }
+
+    public void setCr2(double cr2) {
+        this.cr2 = cr2;
+    }
+
+    public double getCx2() {
+        return this.cx2;
+    }
+
+    public void setCx2(double cx2) {
+        this.cx2 = cx2;
+    }
+
+    public double getCnxa2() {
+        return this.cnxa2;
+    }
+
+    public void setCnxa2(double cnxa2) {
+        this.cnxa2 = cnxa2;
+    }
+
+    // winding3
+
+    public double getWindv3() {
+        return this.windv3;
+    }
+
+    public void setWindv3(double windv3) {
+        this.windv3 = windv3;
+    }
+
+    public double getNomv3() {
+        return this.nomv3;
+    }
+
+    public void setNomv3(double nomv3) {
+        this.nomv3 = nomv3;
+    }
+
+    public double getAng3() {
+        return this.ang3;
+    }
+
+    public void setAng3(double ang3) {
+        this.ang3 = ang3;
+    }
+
+    public double getRata3() {
+        return this.rata3;
+    }
+
+    public void setRata3(double rata3) {
+        this.rata3 = rata3;
+    }
+
+    public double getRatb3() {
+        return this.ratb3;
+    }
+
+    public void setRatb3(double ratb3) {
+        this.ratb3 = ratb3;
+    }
+
+    public double getRatc3() {
+        return this.ratc3;
+    }
+
+    public void setRatc3(double ratc3) {
+        this.ratc3 = ratc3;
+    }
+
+    public int getCod3() {
+        return this.cod3;
+    }
+
+    public void setCod3(int cod3) {
+        this.cod3 = cod3;
+    }
+
+    public int getCont3() {
+        return this.cont3;
+    }
+
+    public void setCont3(int cont3) {
+        this.cont3 = cont3;
+    }
+
+    public double getRma3() {
+        return this.rma3;
+    }
+
+    public void setRma3(double rma3) {
+        this.rma3 = rma3;
+    }
+
+    public double getRmi3() {
+        return this.rmi3;
+    }
+
+    public void setRmi3(double rmi3) {
+        this.rmi3 = rmi3;
+    }
+
+    public double getVma3() {
+        return this.vma3;
+    }
+
+    public void setVma3(double vma3) {
+        this.vma3 = vma3;
+    }
+
+    public double getVmi3() {
+        return this.vmi3;
+    }
+
+    public void setVmi3(double vmi3) {
+        this.vmi3 = vmi3;
+    }
+
+    public int getNtp3() {
+        return this.ntp3;
+    }
+
+    public void setNtp3(int ntp3) {
+        this.ntp3 = ntp3;
+    }
+
+    public int getTab3() {
+        return this.tab3;
+    }
+
+    public void setTab3(int tab3) {
+        this.tab3 = tab3;
+    }
+
+    public double getCr3() {
+        return this.cr3;
+    }
+
+    public void setCr3(double cr3) {
+        this.cr3 = cr3;
+    }
+
+    public double getCx3() {
+        return this.cx3;
+    }
+
+    public void setCx3(double cx3) {
+        this.cx3 = cx3;
+    }
+
+    public double getCnxa3() {
+        return this.cnxa3;
+    }
+
+    public void setCnxa3(double cnxa3) {
+        this.cnxa3 = cnxa3;
+    }
+
+    // windings
+
+    @JsonIgnore
     public WindingRecord getWindingRecord1() {
         return new WindingRecord(windv1, nomv1, ang1, rata1, ratb1, ratc1, cod1, cont1, rma1, rmi1, vma1, vmi1, ntp1,
             tab1, cr1, cx1, cnxa1);
     }
 
+    @JsonIgnore
     public WindingRecord getWindingRecord2() {
         return new WindingRecord(windv2, nomv2, ang2, rata2, ratb2, ratc2, cod2, cont2, rma2, rmi2, vma2, vmi2, ntp2,
             tab2, cr2, cx2, cnxa2);
     }
 
+    @JsonIgnore
     public WindingRecord getWindingRecord3() {
         return new WindingRecord(windv3, nomv3, ang3, rata3, ratb3, ratc3, cod3, cont3, rma3, rmi3, vma3, vmi3, ntp3,
             tab3, cr3, cx3, cnxa3);

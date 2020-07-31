@@ -65,7 +65,7 @@ class FixedBusShuntData extends BlockData {
 
         String[] headers = context.getFixedBusShuntDataReadFields();
         BlockData.<PsseFixedShunt>writeBlock(PsseFixedShunt.class, model.getFixedShunts(), headers,
-            BlockData.quoteFieldsInsideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
+            BlockData.insideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0), outputStream);
         BlockData.writeEndOfBlockAndComment("END OF FIXED SHUNT DATA, BEGIN GENERATOR DATA", outputStream);
     }
@@ -75,7 +75,7 @@ class FixedBusShuntData extends BlockData {
 
         String[] headers = context.getFixedBusShuntDataReadFields();
         List<String> stringList = BlockData.<PsseFixedShunt>writexBlock(PsseFixedShunt.class, model.getFixedShunts(), headers,
-            BlockData.quoteFieldsInsideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
+            BlockData.insideHeaders(fixedBusShuntDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);

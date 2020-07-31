@@ -294,58 +294,6 @@ public class PsseRawReaderTest {
         }
     }
 
-    @Test
-    public void ieee14BusWriteTest() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus.raw")))) {
-            PsseContext context = new PsseContext();
-            PsseRawReader psseRawReader = new PsseRawReader();
-            PsseRawModel rawData = psseRawReader.read(reader, context);
-            assertNotNull(rawData);
-
-            //Path out = Paths.get("\\work\\tmp");
-            //psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev33_export"));
-        }
-    }
-
-    @Test
-    public void ieee14BusRev35WriteTest() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_rev35.raw")))) {
-            PsseContext context = new PsseContext();
-            PsseRawReader psseRawReader = new PsseRawReader();
-            PsseRawModel rawData = psseRawReader.read(reader, context);
-            assertNotNull(rawData);
-
-            //Path out = Paths.get("\\work\\tmp");
-            //psseRawReader.write(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev35_export"));
-        }
-    }
-
-    @Test
-    public void minimalExampleRawxWriteTest() throws IOException {
-        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/MinimalExample.rawx")), StandardCharsets.UTF_8);
-        assertNotNull(jsonFile);
-        PsseContext context = new PsseContext();
-        PsseRawReader psseRawReader = new PsseRawReader();
-        PsseRawModel rawData = psseRawReader.readx(jsonFile, context);
-        assertNotNull(rawData);
-
-        //Path out = Paths.get("\\work\\tmp");
-        //psseRawReader.writex(rawData, context, new FileDataSource(out, "MinimalExample_export"));
-    }
-
-    @Test
-    public void ieee14BusRev35RawxWriteTest() throws IOException {
-        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_rev35.rawx")), StandardCharsets.UTF_8);
-        assertNotNull(jsonFile);
-        PsseContext context = new PsseContext();
-        PsseRawReader psseRawReader = new PsseRawReader();
-        PsseRawModel rawData = psseRawReader.readx(jsonFile, context);
-        assertNotNull(rawData);
-
-        //Path out = Paths.get("\\work\\tmp");
-        //psseRawReader.writex(rawData, context, new FileDataSource(out, "IEEE_14_bus_rev35_export"));
-    }
-
     private boolean compareReadFields(String[] expected, String[] actual) {
         if (actual != null && expected != null && actual.length == expected.length) {
             for (int i = 0; i < expected.length; i++) {

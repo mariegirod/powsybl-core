@@ -24,7 +24,9 @@ import com.powsybl.psse.model.PsseContext;
 import com.powsybl.psse.model.PsseException;
 import com.powsybl.psse.model.PsseRawModel;
 import com.powsybl.psse.model.PsseRawModel35;
+import com.powsybl.psse.model.data.JsonModel.ArrayData;
 import com.powsybl.psse.model.data.JsonModel.JsonNetwork;
+import com.powsybl.psse.model.data.JsonModel.TableData;
 
 /**
  *
@@ -274,21 +276,62 @@ public class PsseData {
 
         JsonNetwork network = new JsonNetwork();
 
-        network.setCaseid(new CaseIdentificationData(version, format).writex(model, context));
-        network.setBus(new BusData(version, format).writex(model, context));
-        network.setLoad(new LoadData(version, format).writex(model, context));
-        network.setFixshunt(new FixedBusShuntData(version, format).writex(model, context));
-        network.setGenerator(new GeneratorData(version, format).writex(model, context));
-        network.setAcline(new NonTransformerBranchData(version, format).writex(model, context));
+        ArrayData arrayData = new CaseIdentificationData(version, format).writex(model, context);
+        if (arrayDataIsNotEmpty(arrayData)) {
+            network.setCaseid(arrayData);
+        }
+        TableData tableData = new BusData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setBus(tableData);
+        }
+        tableData = new LoadData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setLoad(tableData);
+        }
+        tableData = new FixedBusShuntData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setFixshunt(tableData);
+        }
+        tableData = new GeneratorData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setGenerator(tableData);
+        }
+        tableData = new NonTransformerBranchData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setAcline(tableData);
+        }
+        tableData = new TransformerData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setTransformer(tableData);
+        }
 
-        network.setArea(new AreaInterchangeData(version, format).writex(model, context));
-        network.setZone(new ZoneData(version, format).writex(model, context));
-        network.setOwner(new OwnerData(version, format).writex(model, context));
+        tableData = new AreaInterchangeData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setArea(tableData);
+        }
+        tableData = new ZoneData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setZone(tableData);
+        }
+        tableData = new OwnerData(version, format).writex(model, context);
+        if (tableDataIsNotEmpty(tableData)) {
+            network.setOwner(tableData);
+        }
 
         JsonModel jsonModel = new JsonModel(network);
         String json = BlockData.writexJsonModel(jsonModel);
         String adjustedJson = StringUtils.replaceEach(json, new String[] {"\"[", "]\"", "\\\""}, new String[] {"[", "]", "\""});
         outputStream.write(adjustedJson.getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
+    }
+
+    private boolean arrayDataIsNotEmpty(ArrayData arrayData) {
+        return arrayData.getQuotedFields() != null && arrayData.getData() != null
+            && !arrayData.getQuotedFields().isEmpty() && !arrayData.getData().isEmpty();
+    }
+
+    private boolean tableDataIsNotEmpty(TableData tableData) {
+        return tableData.getQuotedFields() != null && tableData.getData() != null
+            && !tableData.getQuotedFields().isEmpty() && !tableData.getData().isEmpty();
     }
 }

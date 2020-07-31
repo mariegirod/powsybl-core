@@ -72,7 +72,7 @@ class NonTransformerBranchData extends BlockData {
         assertMinimumExpectedVersion(PsseBlockData.NON_TRANSFORMER_BRANCH_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getNonTransformerBranchDataReadFields();
-        String[] quoteFields = BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers);
+        String[] quoteFields = BlockData.insideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers);
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
@@ -101,7 +101,7 @@ class NonTransformerBranchData extends BlockData {
 
         List<String> stringList = BlockData.<PsseNonTransformerBranch35>writexBlock(PsseNonTransformerBranch35.class,
             nonTransformerBranch35List, headers,
-            BlockData.quoteFieldsInsideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers),
+            BlockData.insideHeaders(nonTransformerBranchDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);

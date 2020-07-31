@@ -29,7 +29,7 @@ public class JsonModel {
         return this.network;
     }
 
-    @JsonPropertyOrder({"caseid", "bus", "load", "fixshunt", "generator", "acline"})
+    @JsonPropertyOrder({"caseid", "bus", "load", "fixshunt", "generator", "acline", "transformer", "area", "zone", "owner"})
     public static class JsonNetwork {
         private ArrayData caseid;
         private TableData bus;
@@ -37,6 +37,7 @@ public class JsonModel {
         private TableData fixshunt;
         private TableData generator;
         private TableData acline;
+        private TableData transformer;
         private TableData area;
         private TableData zone;
         private TableData owner;
@@ -87,6 +88,14 @@ public class JsonModel {
 
         public TableData getAcline() {
             return this.acline;
+        }
+
+        void setTransformer(TableData transformer) {
+            this.transformer = transformer;
+        }
+
+        public TableData getTransformer() {
+            return this.transformer;
         }
 
         void setArea(TableData area) {
@@ -163,11 +172,13 @@ public class JsonModel {
         }
     }
 
+    // null if this block have not read
     private static List<String> addQuote(String[] fields) {
         List<String> list = new ArrayList<>();
-
-        for (int i = 0; i < fields.length; i++) {
-            list.add("\"" + fields[i] + "\"");
+        if (fields != null) {
+            for (int i = 0; i < fields.length; i++) {
+                list.add("\"" + fields[i] + "\"");
+            }
         }
         return list;
     }

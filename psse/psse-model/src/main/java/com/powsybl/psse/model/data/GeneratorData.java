@@ -72,7 +72,7 @@ class GeneratorData extends BlockData {
         assertMinimumExpectedVersion(PsseBlockData.GENERATOR_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getGeneratorDataReadFields();
-        String[] quoteFields = BlockData.quoteFieldsInsideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers);
+        String[] quoteFields = BlockData.insideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers);
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
@@ -98,7 +98,7 @@ class GeneratorData extends BlockData {
             .map(m -> (PsseGenerator35) m).collect(Collectors.toList()); // TODO improve
 
         List<String> stringList = BlockData.<PsseGenerator35>writexBlock(PsseGenerator35.class, generator35List, headers,
-            BlockData.quoteFieldsInsideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers),
+            BlockData.insideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);

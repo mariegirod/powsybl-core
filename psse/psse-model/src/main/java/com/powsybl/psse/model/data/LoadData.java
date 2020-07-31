@@ -72,7 +72,7 @@ class LoadData extends BlockData {
         assertMinimumExpectedVersion(PsseBlockData.LOAD_DATA, PsseVersion.VERSION_33);
 
         String[] headers = context.getLoadDataReadFields();
-        String[] quoteFields = BlockData.quoteFieldsInsideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers);
+        String[] quoteFields = BlockData.insideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers);
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
@@ -97,7 +97,7 @@ class LoadData extends BlockData {
             .map(m -> (PsseLoad35) m).collect(Collectors.toList()); // TODO improve
 
         List<String> stringList = BlockData.<PsseLoad35>writexBlock(PsseLoad35.class, load35List, headers,
-            BlockData.quoteFieldsInsideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers),
+            BlockData.insideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);

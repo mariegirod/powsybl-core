@@ -65,7 +65,7 @@ class ZoneData extends BlockData {
 
         String[] headers = context.getZoneDataReadFields();
         BlockData.<PsseZone>writeBlock(PsseZone.class, model.getZones(), headers,
-            BlockData.quoteFieldsInsideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            BlockData.insideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF ZONE DATA, BEGIN INTER-AREA TRANSFER DATA", outputStream);
     }
@@ -75,7 +75,7 @@ class ZoneData extends BlockData {
 
         String[] headers = context.getZoneDataReadFields();
         List<String> stringList = BlockData.<PsseZone>writexBlock(PsseZone.class, model.getZones(), headers,
-            BlockData.quoteFieldsInsideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0));
+            BlockData.insideHeaders(zoneDataQuoteFields(), headers), context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);
     }

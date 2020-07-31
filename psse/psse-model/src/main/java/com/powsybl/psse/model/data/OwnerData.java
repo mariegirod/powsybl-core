@@ -65,7 +65,7 @@ class OwnerData extends BlockData {
 
         String[] headers = context.getOwnerDataReadFields();
         BlockData.<PsseOwner>writeBlock(PsseOwner.class, model.getOwners(), headers,
-            BlockData.quoteFieldsInsideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0),
+            BlockData.insideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0),
             outputStream);
         BlockData.writeEndOfBlockAndComment("END OF OWNER DATA, BEGIN FACTS CONTROL DEVICE DATA", outputStream);
     }
@@ -75,7 +75,7 @@ class OwnerData extends BlockData {
 
         String[] headers = context.getOwnerDataReadFields();
         List<String> stringList = BlockData.<PsseOwner>writexBlock(PsseOwner.class, model.getOwners(), headers,
-            BlockData.quoteFieldsInsideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0));
+            BlockData.insideHeaders(ownerDataQuoteFields(), headers), context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);
     }

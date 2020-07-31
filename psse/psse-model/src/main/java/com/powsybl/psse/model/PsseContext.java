@@ -107,7 +107,7 @@ public class PsseContext {
         return this.t2wTransformerDataReadFields == null;
     }
 
-    String[] get2wTransformerDataReadFields() {
+    public String[] get2wTransformerDataReadFields() {
         return this.t2wTransformerDataReadFields;
     }
 
