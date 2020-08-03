@@ -129,8 +129,7 @@ class TransformerData extends BlockData {
     }
 
     private static void setRawxReadFields(List<String> records, String[] headers, PsseContext context) {
-        for (int i = 0; i < records.size(); i++) {
-            String record = records.get(i);
+        records.forEach(record -> {
             if (is3wtransformer(record, context.getDelimiter())) {
                 if (context.is3wTransformerDataReadFieldsEmpty()) {
                     context.set3wTransformerDataReadFields(readFields(record, headers, context.getDelimiter()));
@@ -143,7 +142,7 @@ class TransformerData extends BlockData {
             if (!context.is3wTransformerDataReadFieldsEmpty() && !context.is2wTransformerDataReadFieldsEmpty()) {
                 return;
             }
-        }
+        });
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
