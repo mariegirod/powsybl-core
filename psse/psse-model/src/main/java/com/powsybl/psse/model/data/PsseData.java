@@ -35,6 +35,8 @@ import com.powsybl.psse.model.data.JsonModel.TableData;
  */
 public class PsseData {
 
+    // Check
+
     public boolean checkCase(BufferedReader reader) throws IOException {
 
         // CaseIdentification does not change, so it is read using version 33
@@ -70,6 +72,8 @@ public class PsseData {
 
         return ic == 0 && sbase > 0. && ArrayUtils.contains(PsseConstants.SUPPORTED_VERSIONS, rev) && basfrq > 0.0;
     }
+
+    // Read
 
     public PsseRawModel read(BufferedReader reader, PsseContext context) throws IOException {
 
@@ -173,6 +177,8 @@ public class PsseData {
         BlockData.readDiscardedRecordBlock(reader); // TODO
     }
 
+    // Readx
+
     public PsseRawModel readx(String jsonFile, PsseContext context) throws IOException {
 
         PsseVersion version = PsseVersion.VERSION_35;
@@ -202,6 +208,7 @@ public class PsseData {
     }
 
     // write
+
     public void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
         if (model.getCaseIdentification().getRev() == 33) {
             write33(model, context, outputStream);
@@ -270,6 +277,8 @@ public class PsseData {
         BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
     }
 
+    // writex
+
     public void writex(PsseRawModel model, PsseContext context, OutputStream outputStream) throws IOException {
         PsseVersion version = PsseVersion.VERSION_35;
         PsseFileFormat format = PsseFileFormat.FORMAT_RAWX;
@@ -277,44 +286,44 @@ public class PsseData {
         JsonNetwork network = new JsonNetwork();
 
         ArrayData arrayData = new CaseIdentificationData(version, format).writex(model, context);
-        if (arrayDataIsNotEmpty(arrayData)) {
+        if (!arrayDataIsEmpty(arrayData)) {
             network.setCaseid(arrayData);
         }
         TableData tableData = new BusData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setBus(tableData);
         }
         tableData = new LoadData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setLoad(tableData);
         }
         tableData = new FixedBusShuntData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setFixshunt(tableData);
         }
         tableData = new GeneratorData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setGenerator(tableData);
         }
         tableData = new NonTransformerBranchData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setAcline(tableData);
         }
         tableData = new TransformerData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setTransformer(tableData);
         }
 
         tableData = new AreaInterchangeData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setArea(tableData);
         }
         tableData = new ZoneData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setZone(tableData);
         }
         tableData = new OwnerData(version, format).writex(model, context);
-        if (tableDataIsNotEmpty(tableData)) {
+        if (!tableDataIsEmpty(tableData)) {
             network.setOwner(tableData);
         }
 
@@ -325,13 +334,13 @@ public class PsseData {
         outputStream.flush();
     }
 
-    private boolean arrayDataIsNotEmpty(ArrayData arrayData) {
-        return arrayData.getQuotedFields() != null && arrayData.getData() != null
-            && !arrayData.getQuotedFields().isEmpty() && !arrayData.getData().isEmpty();
+    private boolean arrayDataIsEmpty(ArrayData arrayData) {
+        return arrayData.getQuotedFields() == null || arrayData.getData() == null
+            || arrayData.getQuotedFields().isEmpty() || arrayData.getData().isEmpty();
     }
 
-    private boolean tableDataIsNotEmpty(TableData tableData) {
-        return tableData.getQuotedFields() != null && tableData.getData() != null
-            && !tableData.getQuotedFields().isEmpty() && !tableData.getData().isEmpty();
+    private boolean tableDataIsEmpty(TableData tableData) {
+        return tableData.getQuotedFields() == null || tableData.getData() == null
+            || tableData.getQuotedFields().isEmpty() || tableData.getData().isEmpty();
     }
 }
