@@ -87,4 +87,47 @@ public class PsseWriterTest extends AbstractConverterTest {
             compareTxt(getClass().getResourceAsStream("/" + "IEEE_14_bus_rev35_exported.rawx"), is);
         }
     }
+
+    @Test
+    public void ieee24BusWriteTest() throws IOException {
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            new PsseWriter().write(rawData, context, new FileDataSource(fileSystem.getPath("/work/"), "IEEE_24_bus_exported"));
+            try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_24_bus_exported.raw"))) {
+                compareTxt(getClass().getResourceAsStream("/" + "IEEE_24_bus_exported.raw"), is);
+            }
+        }
+    }
+
+    @Test
+    public void ieee24BusRev35WriteTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus_rev35.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            new PsseWriter().write(rawData, context, new FileDataSource(fileSystem.getPath("/work/"), "IEEE_24_bus_rev35_exported"));
+            try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_24_bus_rev35_exported.raw"))) {
+                compareTxt(getClass().getResourceAsStream("/" + "IEEE_24_bus_rev35_exported.raw"), is);
+            }
+        }
+    }
+
+    @Test
+    public void ieee24BusRev35RawxWriteTest() throws IOException {
+        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus_rev35.rawx")), StandardCharsets.UTF_8);
+        assertNotNull(jsonFile);
+        PsseContext context = new PsseContext();
+        PsseRawModel rawData = new PsseRawReader().readx(jsonFile, context);
+        assertNotNull(rawData);
+
+        new PsseWriter().writex(rawData, context, new FileDataSource(fileSystem.getPath("/work/"), "IEEE_24_bus_rev35_exported"));
+        try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_24_bus_rev35_exported.rawx"))) {
+            compareTxt(getClass().getResourceAsStream("/" + "IEEE_24_bus_rev35_exported.rawx"), is);
+        }
+    }
 }

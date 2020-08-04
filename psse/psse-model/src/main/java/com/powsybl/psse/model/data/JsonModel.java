@@ -40,6 +40,7 @@ public class JsonModel {
         private TableData area;
         private TableData zone;
         private TableData owner;
+        private TableData swshunt;
 
         void setCaseid(ArrayData caseid) {
             this.caseid = caseid;
@@ -119,6 +120,14 @@ public class JsonModel {
 
         public TableData getOwner() {
             return this.owner;
+        }
+
+        void setSwshunt(TableData swshunt) {
+            this.swshunt = swshunt;
+        }
+
+        public TableData getSwshunt() {
+            return this.swshunt;
         }
     }
 

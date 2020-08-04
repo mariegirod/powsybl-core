@@ -294,6 +294,79 @@ public class PsseRawReaderTest {
         }
     }
 
+    @Test
+    public void ieee24BusTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus.raw")))) {
+            PsseRawModel rawData = new PsseRawReader().read(reader);
+            assertNotNull(rawData);
+            String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus.json")), StandardCharsets.UTF_8);
+            String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+            assertEquals(jsonRef, json);
+        }
+    }
+
+    @Test
+    public void ieee24BusSwitchedShuntDataReadFieldsTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            String[] expectedSwitchedShuntDataReadFields = new String[] {"i", "modsw", "adjm", "stat", "vswhi", "vswlo", "swrem", "rmpct", "rmidnt", "binit", "n1", "b1"};
+            String[] actualSwitchedShuntDataReadFields = context.getSwitchedShuntDataReadFields();
+            assertTrue(compareReadFields(expectedSwitchedShuntDataReadFields, actualSwitchedShuntDataReadFields));
+        }
+    }
+
+    @Test
+    public void ieee24BusRev35Test() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus_rev35.raw")))) {
+            PsseRawModel rawData = new PsseRawReader().read(reader);
+            assertNotNull(rawData);
+            String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus_rev35.json")), StandardCharsets.UTF_8);
+            String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+            assertEquals(jsonRef, json);
+        }
+    }
+
+    @Test
+    public void ieee14BusRev35SwitchedShuntDataReadReadFieldsTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_24_bus_rev35.raw")))) {
+            assertNotNull(reader);
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            String[] expectedSwitchedShuntDataReadFields = new String[] {"i", "id", "modsw", "adjm", "stat", "vswhi", "vswlo", "swreg", "nreg", "rmpct", "rmidnt", "binit", "s1", "n1", "b1"};
+            String[] actualSwitchedShuntDataReadFields = context.getSwitchedShuntDataReadFields();
+            assertTrue(compareReadFields(expectedSwitchedShuntDataReadFields, actualSwitchedShuntDataReadFields));
+        }
+    }
+
+    @Test
+    public void ieee24BusRev35RawxTest() throws IOException {
+        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus_rev35.rawx")), StandardCharsets.UTF_8);
+        assertNotNull(jsonFile);
+        PsseRawModel rawData = new PsseRawReader().readx(jsonFile);
+
+        String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus_rev35.json")), StandardCharsets.UTF_8);
+        String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+        assertEquals(jsonRef, json);
+    }
+
+    @Test
+    public void ieee24BusRev35RawxSwitchedShuntDataReadFieldsTest() throws IOException {
+        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_24_bus_rev35.rawx")), StandardCharsets.UTF_8);
+        assertNotNull(jsonFile);
+        PsseContext context = new PsseContext();
+        PsseRawModel rawData = new PsseRawReader().readx(jsonFile, context);
+        assertNotNull(rawData);
+
+        String[] expectedSwitchedShuntDataReadFields = new String[] {"i", "id", "modsw", "adjm", "stat", "vswhi", "vswlo", "swreg", "nreg", "rmpct", "rmidnt", "binit", "s1", "n1", "b1"};
+        String[] actualSwitchedShuntDataReadFields = context.getSwitchedShuntDataReadFields();
+        assertTrue(compareReadFields(expectedSwitchedShuntDataReadFields, actualSwitchedShuntDataReadFields));
+    }
+
     private boolean compareReadFields(String[] expected, String[] actual) {
         if (actual != null && expected != null && actual.length == expected.length) {
             for (int i = 0; i < expected.length; i++) {

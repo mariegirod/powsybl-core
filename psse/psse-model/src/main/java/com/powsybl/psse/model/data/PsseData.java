@@ -273,7 +273,7 @@ public class PsseData {
         new OwnerData(version).write(model, context, outputStream);
 
         BlockData.writeEndOfBlockAndComment("END OF FACTS CONTROL DEVICE DATA, BEGIN SWITCHED SHUNT DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF SWITCHED SHUNT DATA, BEGIN GNE DEVICE DATA", outputStream);
+        new SwitchedShuntData(version).write(model, context, outputStream);
         BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
     }
 
@@ -325,6 +325,10 @@ public class PsseData {
         tableData = new OwnerData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setOwner(tableData);
+        }
+        tableData = new SwitchedShuntData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setSwshunt(tableData);
         }
 
         JsonModel jsonModel = new JsonModel(network);
