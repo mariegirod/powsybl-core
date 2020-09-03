@@ -46,7 +46,7 @@ class SwitchedShuntData extends BlockData {
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
             List<PsseSwitchedShunt35> switchedShunt35List = parseRecordsHeader(records, PsseSwitchedShunt35.class, headers);
-            return new ArrayList<>(switchedShunt35List); // TODO improve
+            return new ArrayList<>(switchedShunt35List);
         } else { // version_33
             return parseRecordsHeader(records, PsseSwitchedShunt.class, headers);
         }
@@ -65,7 +65,7 @@ class SwitchedShuntData extends BlockData {
 
         context.setSwitchedShuntDataReadFields(headers);
         List<PsseSwitchedShunt35> switchedShunt35List = parseRecordsHeader(records, PsseSwitchedShunt35.class, headers);
-        return new ArrayList<>(switchedShunt35List); // TODO improve
+        return new ArrayList<>(switchedShunt35List);
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
@@ -77,7 +77,7 @@ class SwitchedShuntData extends BlockData {
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
             List<PsseSwitchedShunt35> switchedShunts35List = model.getSwitchedShunts().stream()
-                .map(m -> (PsseSwitchedShunt35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseSwitchedShunt35) m).collect(Collectors.toList());
 
             BlockData.<PsseSwitchedShunt35>writeBlock(PsseSwitchedShunt35.class, switchedShunts35List, headers, quoteFields,
                 context.getDelimiter().charAt(0), outputStream);
@@ -94,7 +94,7 @@ class SwitchedShuntData extends BlockData {
 
         String[] headers = context.getSwitchedShuntDataReadFields();
         List<PsseSwitchedShunt35> switchedShunts35List = model.getSwitchedShunts().stream()
-            .map(m -> (PsseSwitchedShunt35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseSwitchedShunt35) m).collect(Collectors.toList());
 
         List<String> stringList = BlockData.<PsseSwitchedShunt35>writexBlock(PsseSwitchedShunt35.class, switchedShunts35List, headers,
             BlockData.insideHeaders(switchedShuntDataQuoteFields(this.getPsseVersion()), headers),
