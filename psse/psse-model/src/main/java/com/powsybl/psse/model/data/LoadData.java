@@ -46,7 +46,7 @@ class LoadData extends BlockData {
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
             List<PsseLoad35> load35List = parseRecordsHeader(records, PsseLoad35.class, headers);
-            return new ArrayList<>(load35List); // TODO improve
+            return new ArrayList<>(load35List);
         } else { // version_33
             return parseRecordsHeader(records, PsseLoad.class, headers);
         }
@@ -65,7 +65,7 @@ class LoadData extends BlockData {
 
         context.setLoadDataReadFields(headers);
         List<PsseLoad35> load35List = parseRecordsHeader(records, PsseLoad35.class, headers);
-        return new ArrayList<>(load35List); // TODO improve
+        return new ArrayList<>(load35List);
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
@@ -77,7 +77,7 @@ class LoadData extends BlockData {
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
             List<PsseLoad35> load35List = model.getLoads().stream()
-                .map(m -> (PsseLoad35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseLoad35) m).collect(Collectors.toList());
 
             BlockData.<PsseLoad35>writeBlock(PsseLoad35.class, load35List, headers, quoteFields,
                 context.getDelimiter().charAt(0), outputStream);
@@ -94,7 +94,7 @@ class LoadData extends BlockData {
 
         String[] headers = context.getLoadDataReadFields();
         List<PsseLoad35> load35List = model.getLoads().stream()
-            .map(m -> (PsseLoad35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseLoad35) m).collect(Collectors.toList());
 
         List<String> stringList = BlockData.<PsseLoad35>writexBlock(PsseLoad35.class, load35List, headers,
             BlockData.insideHeaders(loadDataQuoteFields(this.getPsseVersion()), headers),

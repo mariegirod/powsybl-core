@@ -46,7 +46,7 @@ class NonTransformerBranchData extends BlockData {
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
             List<PsseNonTransformerBranch35> nonTransformerBranch35List = parseRecordsHeader(records, PsseNonTransformerBranch35.class, headers);
-            return new ArrayList<>(nonTransformerBranch35List); // TODO improve
+            return new ArrayList<>(nonTransformerBranch35List);
         } else { // version_33
             return parseRecordsHeader(records, PsseNonTransformerBranch.class, headers);
         }
@@ -65,7 +65,7 @@ class NonTransformerBranchData extends BlockData {
 
         context.setNonTransformerBranchDataReadFields(headers);
         List<PsseNonTransformerBranch35> nonTransformerBranch35List = parseRecordsHeader(records, PsseNonTransformerBranch35.class, headers);
-        return new ArrayList<>(nonTransformerBranch35List); // TODO improve
+        return new ArrayList<>(nonTransformerBranch35List);
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
@@ -77,7 +77,7 @@ class NonTransformerBranchData extends BlockData {
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
             List<PsseNonTransformerBranch35> nonTransformerBranch35List = model.getNonTransformerBranches().stream()
-                .map(m -> (PsseNonTransformerBranch35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseNonTransformerBranch35) m).collect(Collectors.toList());
 
             BlockData.<PsseNonTransformerBranch35>writeBlock(PsseNonTransformerBranch35.class, nonTransformerBranch35List,
                 headers, quoteFields, context.getDelimiter().charAt(0), outputStream);
@@ -97,7 +97,7 @@ class NonTransformerBranchData extends BlockData {
 
         String[] headers = context.getNonTransformerBranchDataReadFields();
         List<PsseNonTransformerBranch35> nonTransformerBranch35List = model.getNonTransformerBranches().stream()
-            .map(m -> (PsseNonTransformerBranch35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseNonTransformerBranch35) m).collect(Collectors.toList());
 
         List<String> stringList = BlockData.<PsseNonTransformerBranch35>writexBlock(PsseNonTransformerBranch35.class,
             nonTransformerBranch35List, headers,
