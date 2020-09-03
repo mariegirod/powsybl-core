@@ -117,7 +117,7 @@ class TransformerData extends BlockData {
 
         setRawxReadFields(records, headers, context);
         List<PsseTransformer35> transformer35List = parseRecordsHeader(records, PsseTransformer35.class, headers);
-        return new ArrayList<>(transformer35List); // TODO improve
+        return new ArrayList<>(transformer35List);
     }
 
     private static boolean is3wtransformer(String record, String delimiter) {
@@ -151,14 +151,14 @@ class TransformerData extends BlockData {
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
             List<PsseTransformer35> transformer35List2w = model.getTransformers().stream().filter(t -> t.getK() == 0)
-                .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseTransformer35) m).collect(Collectors.toList());
             if (!transformer35List2w.isEmpty()) {
                 String[] headers = context.get2wTransformerDataReadFields();
                 this.<PsseTransformer35>write(PsseTransformer35.class, transformer35List2w, headers, context, outputStream, true);
             }
 
             List<PsseTransformer35> transformer35List3w = model.getTransformers().stream().filter(t -> t.getK() != 0)
-                .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseTransformer35) m).collect(Collectors.toList());
             if (!transformer35List3w.isEmpty()) {
                 String[] headers = context.get3wTransformerDataReadFields();
                 this.<PsseTransformer35>write(PsseTransformer35.class, transformer35List3w, headers, context, outputStream, false);
@@ -261,14 +261,14 @@ class TransformerData extends BlockData {
     TableData writex(PsseRawModel model, PsseContext context) {
 
         List<PsseTransformer35> transformer35List2w = model.getTransformers().stream().filter(t -> t.getK() == 0)
-            .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseTransformer35) m).collect(Collectors.toList());
         if (!transformer35List2w.isEmpty()) {
             String[] headers = context.get2wTransformerDataReadFields();
             return writex(transformer35List2w, headers, context);
         }
 
         List<PsseTransformer35> transformer35List3w = model.getTransformers().stream().filter(t -> t.getK() != 0)
-            .map(m -> (PsseTransformer35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseTransformer35) m).collect(Collectors.toList());
         if (!transformer35List3w.isEmpty()) {
             String[] headers = context.get3wTransformerDataReadFields();
             return writex(transformer35List3w, headers, context);

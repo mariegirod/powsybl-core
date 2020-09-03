@@ -46,7 +46,7 @@ class GeneratorData extends BlockData {
 
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
             List<PsseGenerator35> generator35List = parseRecordsHeader(records, PsseGenerator35.class, headers);
-            return new ArrayList<>(generator35List); // TODO improve
+            return new ArrayList<>(generator35List);
         } else { // version_33
             return parseRecordsHeader(records, PsseGenerator.class, headers);
         }
@@ -65,7 +65,7 @@ class GeneratorData extends BlockData {
 
         context.setGeneratorDataReadFields(headers);
         List<PsseGenerator35> generator35List = parseRecordsHeader(records, PsseGenerator35.class, headers);
-        return new ArrayList<>(generator35List); // TODO improve
+        return new ArrayList<>(generator35List);
     }
 
     void write(PsseRawModel model, PsseContext context, OutputStream outputStream) {
@@ -77,7 +77,7 @@ class GeneratorData extends BlockData {
         if (this.getPsseVersion() == PsseVersion.VERSION_35) {
 
             List<PsseGenerator35> generator35List = model.getGenerators().stream()
-                .map(m -> (PsseGenerator35) m).collect(Collectors.toList()); // TODO improve
+                .map(m -> (PsseGenerator35) m).collect(Collectors.toList());
 
             BlockData.<PsseGenerator35>writeBlock(PsseGenerator35.class, generator35List, headers,
                 quoteFields, context.getDelimiter().charAt(0), outputStream);
@@ -95,7 +95,7 @@ class GeneratorData extends BlockData {
 
         String[] headers = context.getGeneratorDataReadFields();
         List<PsseGenerator35> generator35List = model.getGenerators().stream()
-            .map(m -> (PsseGenerator35) m).collect(Collectors.toList()); // TODO improve
+            .map(m -> (PsseGenerator35) m).collect(Collectors.toList());
 
         List<String> stringList = BlockData.<PsseGenerator35>writexBlock(PsseGenerator35.class, generator35List, headers,
             BlockData.insideHeaders(generatorDataQuoteFields(this.getPsseVersion()), headers),
