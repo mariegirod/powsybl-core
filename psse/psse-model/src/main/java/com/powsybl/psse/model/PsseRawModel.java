@@ -32,6 +32,8 @@ public class PsseRawModel {
 
     private final List<PsseArea> areas = new ArrayList<>();
 
+    private final List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections = new ArrayList<>();
+
     private final List<PsseZone> zones = new ArrayList<>();
 
     private final List<PsseOwner> owners = new ArrayList<>();
@@ -100,6 +102,10 @@ public class PsseRawModel {
 
     public List<PsseArea> getAreas() {
         return areas;
+    }
+
+    public List<PsseTransformerImpedanceCorrection> getTransformerImpedanceCorrections() {
+        return transformerImpedanceCorrections;
     }
 
     public void addZones(List<PsseZone> zones) {

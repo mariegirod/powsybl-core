@@ -14,22 +14,22 @@ import java.util.List;
  * @author Luma Zamarreño <zamarrenolm at aia.es>
  * @author José Antonio Marqués <marquesja at aia.es>
  */
-public class PsseTransformerImpedanceCorrection35 {
+public class PsseTransformerImpedanceCorrection35 extends PsseTransformerImpedanceCorrection {
 
-    private int i;
-    private List<PsseTransformerImpedanceCorrection35Point> points;
+    private List<PsseTransformerImpedanceCorrection35Point> points35;
 
     public PsseTransformerImpedanceCorrection35(int i) {
-        this.i = i;
-        this.points = new ArrayList<>();
+        super(i);
+        this.points35 = new ArrayList<>();
     }
 
-    public int getI() {
-        return i;
+    @Override
+    public List<PsseTransformerImpedanceCorrectionPoint> getPoints() {
+        throw new PsseException("Points not available in version 35");
     }
 
-    public List<PsseTransformerImpedanceCorrection35Point> getPoints() {
-        return points;
+    public List<PsseTransformerImpedanceCorrection35Point> getPoints35() {
+        return points35;
     }
 
     public static class PsseTransformerImpedanceCorrection35Point {
