@@ -46,7 +46,7 @@ class TransformerImpedanceCorrectionTablesData extends BlockData {
         super(psseVersion, psseFileFormat);
     }
 
-    List<PsseTransformerImpedanceCorrection> read(BufferedReader reader, PsseContext context) throws IOException {
+    List<PsseTransformerImpedanceCorrection> read(BufferedReader reader) throws IOException {
         assertMinimumExpectedVersion(PsseBlockData.TRANSFORMER_IMPEDANCE_CORRECTION_TABLES, PsseVersion.VERSION_33);
 
         List<String> records = readRecordBlock(reader);
@@ -174,7 +174,7 @@ class TransformerImpedanceCorrectionTablesData extends BlockData {
     }
 
     private static boolean validPoint(double t, double ref, double imf) {
-        return t != 0.0 && ref != 0.0 && imf != 0.0;
+        return t != 0.0 && (ref != 0.0 || imf != 0.0);
     }
 
     List<PsseTransformerImpedanceCorrection> readx(JsonNode networkNode, PsseContext context) {
@@ -188,6 +188,7 @@ class TransformerImpedanceCorrectionTablesData extends BlockData {
         String[] headers = nodeFields(impedanceCorrectionNode);
         List<String> records = nodeRecords(impedanceCorrectionNode);
 
+        context.setTransformerImpedanceCorrectionTablesDataReadFields(headers);
         List<PsseTransformerImpedanceCorrection35Recordx> recordxImpedanceCorrection35List = parseRecordsHeader(records, PsseTransformerImpedanceCorrection35Recordx.class, headers);
         List<PsseTransformerImpedanceCorrection35> impedanceCorrectionList35 = convertToImpedanceCorrection35List(recordxImpedanceCorrection35List);
         return new ArrayList<>(impedanceCorrectionList35);
@@ -405,15 +406,33 @@ class TransformerImpedanceCorrectionTablesData extends BlockData {
     TableData writex(PsseRawModel model, PsseContext context) {
         assertMinimumExpectedVersion(PsseBlockData.TRANSFORMER_IMPEDANCE_CORRECTION_TABLES, PsseVersion.VERSION_35, PsseFileFormat.FORMAT_RAWX);
 
-        String[] headers = context.getLoadDataReadFields();
+        String[] headers = context.getTransformerImpedanceCorrectionTablesDataReadFields();
         List<PsseTransformerImpedanceCorrection35> impedanceCorrection35List = model.getTransformerImpedanceCorrections().stream()
             .map(m -> (PsseTransformerImpedanceCorrection35) m).collect(Collectors.toList());
 
-        List<String> stringList = BlockData.<PsseTransformerImpedanceCorrection35>writexBlock(PsseTransformerImpedanceCorrection35.class, impedanceCorrection35List, headers,
+        List<PsseTransformerImpedanceCorrection35Recordx> recordxImpedanceCorrection35List = convertToRecord1ImpedanceCorrection35(impedanceCorrection35List);
+
+        List<String> stringList = BlockData.<PsseTransformerImpedanceCorrection35Recordx>writexBlock(PsseTransformerImpedanceCorrection35Recordx.class, recordxImpedanceCorrection35List, headers,
             BlockData.insideHeaders(transformerImpedanceCorrectionTablesDataQuoteFields(), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);
+    }
+
+    private static List<PsseTransformerImpedanceCorrection35Recordx> convertToRecord1ImpedanceCorrection35(
+        List<PsseTransformerImpedanceCorrection35> impedanceCorrection35List) {
+        List<PsseTransformerImpedanceCorrection35Recordx> recordxImpedanceCorrection35List = new ArrayList<>();
+
+        impedanceCorrection35List.forEach(impedanceCorrection35 ->
+            impedanceCorrection35.getPoints35().forEach(
+                point35 -> {
+                    PsseTransformerImpedanceCorrection35Recordx recordx = new PsseTransformerImpedanceCorrection35Recordx();
+                    recordx.set(impedanceCorrection35.getI(), point35.getT(), point35.getRef(), point35.getImf());
+                    recordxImpedanceCorrection35List.add(recordx);
+                })
+        );
+
+        return recordxImpedanceCorrection35List;
     }
 
     private static String[] transformerImpedanceCorrectionTablesDataHeaders35Record1() {

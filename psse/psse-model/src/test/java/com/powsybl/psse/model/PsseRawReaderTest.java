@@ -99,10 +99,9 @@ public class PsseRawReaderTest {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed.raw")))) {
             PsseRawModel rawData = new PsseRawReader().read(reader);
             assertNotNull(rawData);
-            //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus.json")), StandardCharsets.UTF_8);
+            String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_completed.json")), StandardCharsets.UTF_8);
             String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
-            //assertEquals(jsonRef, json);
-            System.err.printf("(%s) %n", json);
+            assertEquals(jsonRef, json);
         }
     }
 
@@ -242,10 +241,9 @@ public class PsseRawReaderTest {
         assertNotNull(jsonFile);
         PsseRawModel rawData = new PsseRawReader().readx(jsonFile);
 
-        //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_rev35.json")), StandardCharsets.UTF_8);
+        String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.json")), StandardCharsets.UTF_8);
         String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
-        //assertEquals(jsonRef, json);
-        System.err.printf("(%s) %n", json);
+        assertEquals(jsonRef, json);
     }
 
     @Test
@@ -323,10 +321,9 @@ public class PsseRawReaderTest {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.raw")))) {
             PsseRawModel rawData = new PsseRawReader().read(reader);
             assertNotNull(rawData);
-            //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_rev35.json")), StandardCharsets.UTF_8);
+            String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.json")), StandardCharsets.UTF_8);
             String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
-            //assertEquals(jsonRef, json);
-            System.err.printf("(%s) %n", json);
+            assertEquals(jsonRef, json);
         }
     }
 

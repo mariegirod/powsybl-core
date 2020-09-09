@@ -282,5 +282,12 @@ public class PsseTransformerImpedanceCorrection35 extends PsseTransformerImpedan
         public double getImfact() {
             return imfact;
         }
+
+        public void set(int itable, double tap, double refact, double imfact) {
+            this.itable = itable;
+            this.tap = tap;
+            this.refact = refact;
+            this.imfact = imfact;
+        }
     }
 }

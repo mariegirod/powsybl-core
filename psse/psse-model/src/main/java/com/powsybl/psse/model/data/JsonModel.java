@@ -38,6 +38,7 @@ public class JsonModel {
         private TableData acline;
         private TableData transformer;
         private TableData area;
+        private TableData impcor;
         private TableData zone;
         private TableData owner;
         private TableData swshunt;
@@ -104,6 +105,14 @@ public class JsonModel {
 
         public TableData getArea() {
             return this.area;
+        }
+
+        void setImpcor(TableData impcor) {
+            this.impcor = impcor;
+        }
+
+        public TableData getImpcor() {
+            return this.impcor;
         }
 
         void setZone(TableData zone) {

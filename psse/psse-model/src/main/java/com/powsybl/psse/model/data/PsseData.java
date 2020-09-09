@@ -150,7 +150,7 @@ public class PsseData {
         BlockData.readDiscardedRecordBlock(reader); // TODO
 
         // impedance correction data
-        model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version).read(reader,  context));
+        model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version).read(reader));
 
         // multi-terminal DC data
         BlockData.readDiscardedRecordBlock(reader); // TODO
@@ -318,6 +318,10 @@ public class PsseData {
         tableData = new AreaInterchangeData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setArea(tableData);
+        }
+        tableData = new TransformerImpedanceCorrectionTablesData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setImpcor(tableData);
         }
         tableData = new ZoneData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
