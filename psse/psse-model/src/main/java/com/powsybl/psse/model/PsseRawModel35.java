@@ -52,6 +52,14 @@ public class PsseRawModel35 extends PsseRawModel {
     }
 
     @Override
+    public void addTransformerImpedanceCorrections(List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections) {
+        if (transformerImpedanceCorrections.stream().anyMatch(transformerImpedanceCorrection -> !(transformerImpedanceCorrection instanceof PsseTransformerImpedanceCorrection35))) {
+            throw new PsseException("PsseRawModel35. Unexpected instanceof transformerImpedanceCorrection");
+        }
+        getTransformerImpedanceCorrections().addAll(transformerImpedanceCorrections);
+    }
+
+    @Override
     public void addSwitchedShunts(List<PsseSwitchedShunt> switchedShunts) {
         if (switchedShunts.stream().anyMatch(switchedShunt -> !(switchedShunt instanceof PsseSwitchedShunt35))) {
             throw new PsseException("PsseRawModel35. Unexpected instanceof switchedShunt");

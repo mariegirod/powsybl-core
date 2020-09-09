@@ -104,6 +104,10 @@ public class PsseRawModel {
         return areas;
     }
 
+    public void addTransformerImpedanceCorrections(List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections) {
+        this.transformerImpedanceCorrections.addAll(transformerImpedanceCorrections);
+    }
+
     public List<PsseTransformerImpedanceCorrection> getTransformerImpedanceCorrections() {
         return transformerImpedanceCorrections;
     }

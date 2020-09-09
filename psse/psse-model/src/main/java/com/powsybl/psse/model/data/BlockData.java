@@ -154,6 +154,15 @@ class BlockData {
         writer.flush();
     }
 
+    static <T> void writeBlock(Class<T> aClass, T modelRecord, String[] headers, String[] quoteFields,
+        char delimiter, OutputStream outputStream) {
+
+        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter, '\'');
+        CsvWriter writer = new CsvWriter(outputStream, settings);
+        writer.processRecord(modelRecord);
+        writer.flush();
+    }
+
     static <T> List<String> writeBlock(Class<T> aClass, List<T> modelRecords, String[] headers, String[] quoteFields,
         char delimiter) {
 

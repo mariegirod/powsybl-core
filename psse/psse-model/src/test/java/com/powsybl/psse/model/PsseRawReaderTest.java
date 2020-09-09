@@ -95,6 +95,18 @@ public class PsseRawReaderTest {
     }
 
     @Test
+    public void ieee14BusCompletedTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed.raw")))) {
+            PsseRawModel rawData = new PsseRawReader().read(reader);
+            assertNotNull(rawData);
+            //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus.json")), StandardCharsets.UTF_8);
+            String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+            //assertEquals(jsonRef, json);
+            System.err.printf("(%s) %n", json);
+        }
+    }
+
+    @Test
     public void minimalExampleRawxTest() throws IOException {
         String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/MinimalExample.rawx")), StandardCharsets.UTF_8);
         assertNotNull(jsonFile);
@@ -225,6 +237,18 @@ public class PsseRawReaderTest {
     }
 
     @Test
+    public void ieee14BusCompletedRev35RawxTest() throws IOException {
+        String jsonFile = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.rawx")), StandardCharsets.UTF_8);
+        assertNotNull(jsonFile);
+        PsseRawModel rawData = new PsseRawReader().readx(jsonFile);
+
+        //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_rev35.json")), StandardCharsets.UTF_8);
+        String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+        //assertEquals(jsonRef, json);
+        System.err.printf("(%s) %n", json);
+    }
+
+    @Test
     public void ieee14BusRev35Test() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_rev35.raw")))) {
             PsseRawModel rawData = new PsseRawReader().read(reader);
@@ -291,6 +315,18 @@ public class PsseRawReaderTest {
             String[] expectedOwnerDataReadFields = new String[] {"iowner", "owname"};
             String[] actualOwnerDataReadFields = context.getOwnerDataReadFields();
             assertTrue(compareReadFields(expectedOwnerDataReadFields, actualOwnerDataReadFields));
+        }
+    }
+
+    @Test
+    public void ieee14BusCompletedRev35Test() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.raw")))) {
+            PsseRawModel rawData = new PsseRawReader().read(reader);
+            assertNotNull(rawData);
+            //String jsonRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/IEEE_14_bus_rev35.json")), StandardCharsets.UTF_8);
+            String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(rawData);
+            //assertEquals(jsonRef, json);
+            System.err.printf("(%s) %n", json);
         }
     }
 

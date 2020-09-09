@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
@@ -45,6 +47,24 @@ public class PsseWriterTest extends AbstractConverterTest {
     }
 
     @Test
+    public void ieee14BusCompletedWriteTest() throws IOException {
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            Path out = Paths.get("\\work\\tmp");
+            new PsseWriter().write(rawData, context, new FileDataSource(out, "IEEE_14_bus_completed_exported"));
+            //new PsseWriter().write(rawData, context, new FileDataSource(fileSystem.getPath("/work/"), "IEEE_14_bus_exported"));
+
+            //try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_14_bus_exported.raw"))) {
+            //    compareTxt(getClass().getResourceAsStream("/" + "IEEE_14_bus_exported.raw"), is);
+            //}
+        }
+    }
+
+    @Test
     public void ieee14BusRev35WriteTest() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_rev35.raw")))) {
             PsseContext context = new PsseContext();
@@ -55,6 +75,23 @@ public class PsseWriterTest extends AbstractConverterTest {
             try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_14_bus_rev35_exported.raw"))) {
                 compareTxt(getClass().getResourceAsStream("/" + "IEEE_14_bus_rev35_exported.raw"), is);
             }
+        }
+    }
+
+    @Test
+    public void ieee14BusCompletedRev35WriteTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/IEEE_14_bus_completed_rev35.raw")))) {
+            PsseContext context = new PsseContext();
+            PsseRawModel rawData = new PsseRawReader().read(reader, context);
+            assertNotNull(rawData);
+
+            Path out = Paths.get("\\work\\tmp");
+            new PsseWriter().write(rawData, context, new FileDataSource(out, "IEEE_14_bus_completed_rev35_exported"));
+
+            //new PsseWriter().write(rawData, context, new FileDataSource(fileSystem.getPath("/work/"), "IEEE_14_bus_rev35_exported"));
+            //try (InputStream is = Files.newInputStream(fileSystem.getPath("/work/", "IEEE_14_bus_rev35_exported.raw"))) {
+            //    compareTxt(getClass().getResourceAsStream("/" + "IEEE_14_bus_rev35_exported.raw"), is);
+            //}
         }
     }
 

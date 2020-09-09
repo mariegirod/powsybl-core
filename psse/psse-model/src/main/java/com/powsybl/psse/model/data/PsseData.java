@@ -150,7 +150,7 @@ public class PsseData {
         BlockData.readDiscardedRecordBlock(reader); // TODO
 
         // impedance correction data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
+        model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version).read(reader,  context));
 
         // multi-terminal DC data
         BlockData.readDiscardedRecordBlock(reader); // TODO
@@ -199,6 +199,7 @@ public class PsseData {
         model.addTransformers(new TransformerData(version, format).readx(networkNode, context));
 
         model.addAreas(new AreaInterchangeData(version, format).readx(networkNode, context));
+        model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version, format).readx(networkNode, context));
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
         model.addOwners(new OwnerData(version, format).readx(networkNode, context));
 
@@ -262,7 +263,7 @@ public class PsseData {
 
         BlockData.writeEndOfBlockAndComment("END OF TWO-TERMINAL DC DATA, BEGIN VOLTAGE SOURCE CONVERTER DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF VOLTAGE SOURCE CONVERTER DATA, BEGIN IMPEDANCE CORRECTION DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF IMPEDANCE CORRECTION DATA, BEGIN MULTI-TERMINAL DC DATA", outputStream);
+        new TransformerImpedanceCorrectionTablesData(version).write(model, context, outputStream);
         BlockData.writeEndOfBlockAndComment("END OF MULTI-TERMINAL DC DATA, BEGIN MULTI-SECTION LINE DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF MULTI-SECTION LINE DATA, BEGIN ZONE DATA", outputStream);
 
