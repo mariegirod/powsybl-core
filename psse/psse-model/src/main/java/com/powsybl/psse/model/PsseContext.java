@@ -25,6 +25,7 @@ public class PsseContext {
     private String[] t2wTransformerDataReadFields;
     private String[] areaInterchangeDataReadFields;
     private String[] transformerImpedanceCorrectionTablesDataReadFields;
+    private String[] multiSectionLineGroupingDataReadFields;
     private String[] zoneDataReadFields;
     private String[] ownerDataReadFields;
     private String[] switchedShuntDataReadFields;
@@ -126,6 +127,14 @@ public class PsseContext {
 
     public String[] getTransformerImpedanceCorrectionTablesDataReadFields() {
         return this.transformerImpedanceCorrectionTablesDataReadFields;
+    }
+
+    public void setMultiSectionLineGroupingDataReadFields(String[] fields) {
+        this.multiSectionLineGroupingDataReadFields = fields;
+    }
+
+    public String[] getMultiSectionLineGroupingDataReadFields() {
+        return this.multiSectionLineGroupingDataReadFields;
     }
 
     public void setZoneDataReadFields(String[] fields) {

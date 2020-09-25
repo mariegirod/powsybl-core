@@ -155,9 +155,7 @@ public class PsseData {
         // multi-terminal DC data
         BlockData.readDiscardedRecordBlock(reader); // TODO
 
-        // multi-section line data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
-
+        model.addLineGrouping(new MultiSectionLineGroupingData(version).read(reader));
         model.addZones(new ZoneData(version).read(reader, context));
 
         // inter-area transfer data
@@ -200,6 +198,7 @@ public class PsseData {
 
         model.addAreas(new AreaInterchangeData(version, format).readx(networkNode, context));
         model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version, format).readx(networkNode, context));
+        model.addLineGrouping(new MultiSectionLineGroupingData(version, format).readx(networkNode, context));
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
         model.addOwners(new OwnerData(version, format).readx(networkNode, context));
 
@@ -265,7 +264,7 @@ public class PsseData {
         BlockData.writeEndOfBlockAndComment("END OF VOLTAGE SOURCE CONVERTER DATA, BEGIN IMPEDANCE CORRECTION DATA", outputStream);
         new TransformerImpedanceCorrectionTablesData(version).write(model, context, outputStream);
         BlockData.writeEndOfBlockAndComment("END OF MULTI-TERMINAL DC DATA, BEGIN MULTI-SECTION LINE DATA", outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF MULTI-SECTION LINE DATA, BEGIN ZONE DATA", outputStream);
+        new MultiSectionLineGroupingData(version).write(model, context, outputStream);
 
         new ZoneData(version).write(model, context, outputStream);
 
@@ -322,6 +321,10 @@ public class PsseData {
         tableData = new TransformerImpedanceCorrectionTablesData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setImpcor(tableData);
+        }
+        tableData = new MultiSectionLineGroupingData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setMsline(tableData);
         }
         tableData = new ZoneData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {

@@ -28,31 +28,31 @@ public class PsseLineGrouping {
     private int met = 1;
 
     @Parsed
-    private int dum1;
+    private Integer dum1;
 
     @Parsed
-    private int dum2;
+    private Integer dum2;
 
     @Parsed
-    private int dum3;
+    private Integer dum3;
 
     @Parsed
-    private int dum4;
+    private Integer dum4;
 
     @Parsed
-    private int dum5;
+    private Integer dum5;
 
     @Parsed
-    private int dum6;
+    private Integer dum6;
 
     @Parsed
-    private int dum7;
+    private Integer dum7;
 
     @Parsed
-    private int dum8;
+    private Integer dum8;
 
     @Parsed
-    private int dum9;
+    private Integer dum9;
 
     public int getI() {
         return i;
@@ -78,7 +78,15 @@ public class PsseLineGrouping {
         this.id = id;
     }
 
-    public int getDum1() {
+    public int getMet() {
+        return met;
+    }
+
+    public void setMet(int met) {
+        this.met = met;
+    }
+
+    public Integer getDum1() {
         return dum1;
     }
 
@@ -86,7 +94,7 @@ public class PsseLineGrouping {
         this.dum1 = dum1;
     }
 
-    public int getDum2() {
+    public Integer getDum2() {
         return dum2;
     }
 
@@ -94,7 +102,7 @@ public class PsseLineGrouping {
         this.dum2 = dum2;
     }
 
-    public int getDum3() {
+    public Integer getDum3() {
         return dum3;
     }
 
@@ -102,7 +110,7 @@ public class PsseLineGrouping {
         this.dum3 = dum3;
     }
 
-    public int getDum4() {
+    public Integer getDum4() {
         return dum4;
     }
 
@@ -110,7 +118,7 @@ public class PsseLineGrouping {
         this.dum4 = dum4;
     }
 
-    public int getDum5() {
+    public Integer getDum5() {
         return dum5;
     }
 
@@ -118,7 +126,7 @@ public class PsseLineGrouping {
         this.dum5 = dum5;
     }
 
-    public int getDum6() {
+    public Integer getDum6() {
         return dum6;
     }
 
@@ -126,7 +134,7 @@ public class PsseLineGrouping {
         this.dum6 = dum6;
     }
 
-    public int getDum7() {
+    public Integer getDum7() {
         return dum7;
     }
 
@@ -134,7 +142,7 @@ public class PsseLineGrouping {
         this.dum7 = dum7;
     }
 
-    public int getDum8() {
+    public Integer getDum8() {
         return dum8;
     }
 
@@ -142,11 +150,157 @@ public class PsseLineGrouping {
         this.dum8 = dum8;
     }
 
-    public int getDum9() {
+    public Integer getDum9() {
         return dum9;
     }
 
     public void setDum9(int dum9) {
         this.dum9 = dum9;
+    }
+
+    public static class PsseLineGroupingx {
+
+        @Parsed
+        private int ibus;
+
+        @Parsed
+        private int jbus;
+
+        @Parsed(defaultNullRead = "&1")
+        private String mslid;
+
+        @Parsed
+        private int met = 1;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum1;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum2;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum3;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum4;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum5;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum6;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum7;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum8;
+
+        @Parsed(defaultNullRead = "null")
+        private String dum9;
+
+        public int getIbus() {
+            return ibus;
+        }
+
+        public void setIbus(int ibus) {
+            this.ibus = ibus;
+        }
+
+        public int getJbus() {
+            return jbus;
+        }
+
+        public void setJbus(int jbus) {
+            this.jbus = jbus;
+        }
+
+        public String getMslid() {
+            return mslid;
+        }
+
+        public void setMslid(String mslid) {
+            this.mslid = mslid;
+        }
+
+        public int getMet() {
+            return met;
+        }
+
+        public void setMet(int met) {
+            this.met = met;
+        }
+
+        public String getDum1() {
+            return dum1;
+        }
+
+        public void setDum1(String dum1) {
+            this.dum1 = dum1;
+        }
+
+        public String getDum2() {
+            return dum2;
+        }
+
+        public void setDum2(String dum2) {
+            this.dum2 = dum2;
+        }
+
+        public String getDum3() {
+            return dum3;
+        }
+
+        public void setDum3(String dum3) {
+            this.dum3 = dum3;
+        }
+
+        public String getDum4() {
+            return dum4;
+        }
+
+        public void setDum4(String dum4) {
+            this.dum4 = dum4;
+        }
+
+        public String getDum5() {
+            return dum5;
+        }
+
+        public void setDum5(String dum5) {
+            this.dum5 = dum5;
+        }
+
+        public String getDum6() {
+            return dum6;
+        }
+
+        public void setDum6(String dum6) {
+            this.dum6 = dum6;
+        }
+
+        public String getDum7() {
+            return dum7;
+        }
+
+        public void setDum7(String dum7) {
+            this.dum7 = dum7;
+        }
+
+        public String getDum8() {
+            return dum8;
+        }
+
+        public void setDum8(String dum8) {
+            this.dum8 = dum8;
+        }
+
+        public String getDum9() {
+            return dum9;
+        }
+
+        public void setDum9(String dum9) {
+            this.dum9 = dum9;
+        }
     }
 }

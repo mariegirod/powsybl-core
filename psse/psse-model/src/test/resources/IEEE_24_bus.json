@@ -2222,6 +2222,7 @@
     "arname" : "1           "
   } ],
   "transformerImpedanceCorrections" : [ ],
+  "lineGrouping" : [ ],
   "zones" : [ {
     "i" : 1,
     "zoname" : "1       "
