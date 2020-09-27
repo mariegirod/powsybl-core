@@ -116,7 +116,7 @@ class MultiSectionLineGroupingData extends BlockData {
         model.getLineGrouping().forEach(record -> {
             String[] validHeaders = ArrayUtils.subarray(headers, 0, validRecordFields(record));
             BlockData.<PsseLineGrouping>writeBlock(PsseLineGrouping.class, record, validHeaders,
-                BlockData.insideHeaders(multiSectionLineGroupingDataQuoteFields(), validHeaders),
+                BlockData.insideHeaders(multiSectionLineGroupingDataQuoteFields(this.getPsseVersion(), this.getFileFormat()), validHeaders),
                 context.getDelimiter().charAt(0),
                 outputStream);
         });
@@ -170,7 +170,7 @@ class MultiSectionLineGroupingData extends BlockData {
         String[] headers = context.getMultiSectionLineGroupingDataReadFields();
         List<PsseLineGroupingx> recordListx = convertToPsseLineGroupingx(model.getLineGrouping());
         List<String> stringList = BlockData.<PsseLineGroupingx>writexBlock(PsseLineGroupingx.class, recordListx, headers,
-            BlockData.insideHeaders(multiSectionLineGroupingDataQuoteFields(), headers),
+            BlockData.insideHeaders(multiSectionLineGroupingDataQuoteFields(this.getPsseVersion(), this.getFileFormat()), headers),
             context.getDelimiter().charAt(0));
 
         return new TableData(headers, stringList);
@@ -212,7 +212,12 @@ class MultiSectionLineGroupingData extends BlockData {
         return new String[] {"i", "j", "id", "met", "dum1", "dum2", "dum3", "dum4", "dum5", "dum6", "dum7", "dum8", "dum9"};
     }
 
-    private static String[] multiSectionLineGroupingDataQuoteFields() {
-        return new String[] {"id"};
+    private static String[] multiSectionLineGroupingDataQuoteFields(PsseVersion version,
+        PsseFileFormat psseFileFormat) {
+        if (version == PsseVersion.VERSION_35 && psseFileFormat == PsseFileFormat.FORMAT_RAWX) {
+            return new String[] {"mslid"};
+        } else {
+            return new String[] {"id"};
+        }
     }
 }
