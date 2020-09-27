@@ -157,10 +157,7 @@ public class PsseData {
 
         model.addLineGrouping(new MultiSectionLineGroupingData(version).read(reader));
         model.addZones(new ZoneData(version).read(reader, context));
-
-        // inter-area transfer data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
-
+        model.addInterareaTransfer(new InterareaTransferData(version).read(reader));
         model.addOwners(new OwnerData(version).read(reader, context));
 
         // facts control device data
@@ -200,6 +197,7 @@ public class PsseData {
         model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version, format).readx(networkNode, context));
         model.addLineGrouping(new MultiSectionLineGroupingData(version, format).readx(networkNode, context));
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
+        model.addInterareaTransfer(new InterareaTransferData(version, format).readx(networkNode, context));
         model.addOwners(new OwnerData(version, format).readx(networkNode, context));
 
         model.addSwitchedShunts(new SwitchedShuntData(version, format).readx(networkNode, context));
@@ -267,9 +265,7 @@ public class PsseData {
         new MultiSectionLineGroupingData(version).write(model, context, outputStream);
 
         new ZoneData(version).write(model, context, outputStream);
-
-        BlockData.writeEndOfBlockAndComment("END OF INTER-AREA TRANSFER DATA, BEGIN OWNER DATA", outputStream);
-
+        new InterareaTransferData(version).write(model, context, outputStream);
         new OwnerData(version).write(model, context, outputStream);
 
         BlockData.writeEndOfBlockAndComment("END OF FACTS CONTROL DEVICE DATA, BEGIN SWITCHED SHUNT DATA", outputStream);
@@ -329,6 +325,10 @@ public class PsseData {
         tableData = new ZoneData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setZone(tableData);
+        }
+        tableData = new InterareaTransferData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setIatransfer(tableData);
         }
         tableData = new OwnerData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {

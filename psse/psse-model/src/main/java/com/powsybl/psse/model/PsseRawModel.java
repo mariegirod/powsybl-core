@@ -38,6 +38,8 @@ public class PsseRawModel {
 
     private final List<PsseZone> zones = new ArrayList<>();
 
+    private final List<PsseInterareaTransfer> interareaTransfer = new ArrayList<>();
+
     private final List<PsseOwner> owners = new ArrayList<>();
 
     private final List<PsseSwitchedShunt> switchedShunts = new ArrayList<>();
@@ -128,6 +130,14 @@ public class PsseRawModel {
 
     public List<PsseZone> getZones() {
         return zones;
+    }
+
+    public void addInterareaTransfer(List<PsseInterareaTransfer> interareaTransfer) {
+        this.interareaTransfer.addAll(interareaTransfer);
+    }
+
+    public List<PsseInterareaTransfer> getInterareaTransfer() {
+        return interareaTransfer;
     }
 
     public void addOwners(List<PsseOwner> owners) {

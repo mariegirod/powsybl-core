@@ -41,6 +41,7 @@ public class JsonModel {
         private TableData impcor;
         private TableData msline;
         private TableData zone;
+        private TableData iatransfer;
         private TableData owner;
         private TableData swshunt;
 
@@ -130,6 +131,14 @@ public class JsonModel {
 
         public TableData getZone() {
             return this.zone;
+        }
+
+        void setIatransfer(TableData iatransfer) {
+            this.iatransfer = iatransfer;
+        }
+
+        public TableData getIatransfer() {
+            return this.iatransfer;
         }
 
         void setOwner(TableData owner) {
