@@ -60,6 +60,14 @@ public class PsseRawModel35 extends PsseRawModel {
     }
 
     @Override
+    public void addFacts(List<PsseFacts> facts) {
+        if (facts.stream().anyMatch(fact -> !(fact instanceof PsseFacts35))) {
+            throw new PsseException("PsseRawModel35. Unexpected instanceof fact");
+        }
+        getFacts().addAll(facts);
+    }
+
+    @Override
     public void addSwitchedShunts(List<PsseSwitchedShunt> switchedShunts) {
         if (switchedShunts.stream().anyMatch(switchedShunt -> !(switchedShunt instanceof PsseSwitchedShunt35))) {
             throw new PsseException("PsseRawModel35. Unexpected instanceof switchedShunt");

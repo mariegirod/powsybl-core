@@ -29,6 +29,7 @@ public class PsseContext {
     private String[] interareaTransferDataReadFields;
     private String[] zoneDataReadFields;
     private String[] ownerDataReadFields;
+    private String[] factsDeviceDataReadFields;
     private String[] switchedShuntDataReadFields;
 
     PsseContext() {
@@ -160,6 +161,14 @@ public class PsseContext {
 
     public String[] getOwnerDataReadFields() {
         return this.ownerDataReadFields;
+    }
+
+    public void setFactsDeviceDataReadFields(String[] fields) {
+        this.factsDeviceDataReadFields = fields;
+    }
+
+    public String[] getFactsDeviceDataReadFields() {
+        return this.factsDeviceDataReadFields;
     }
 
     public void setSwitchedShuntDataReadFields(String[] fields) {

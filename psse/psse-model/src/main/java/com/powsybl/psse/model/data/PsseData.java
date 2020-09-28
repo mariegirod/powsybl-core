@@ -159,10 +159,7 @@ public class PsseData {
         model.addZones(new ZoneData(version).read(reader, context));
         model.addInterareaTransfer(new InterareaTransferData(version).read(reader));
         model.addOwners(new OwnerData(version).read(reader, context));
-
-        // facts control device data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
-
+        model.addFacts(new FactsDeviceData(version).read(reader, context));
         model.addSwitchedShunts(new SwitchedShuntData(version).read(reader, context));
 
         // gne device data
@@ -199,7 +196,7 @@ public class PsseData {
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
         model.addInterareaTransfer(new InterareaTransferData(version, format).readx(networkNode, context));
         model.addOwners(new OwnerData(version, format).readx(networkNode, context));
-
+        model.addFacts(new FactsDeviceData(version, format).readx(networkNode, context));
         model.addSwitchedShunts(new SwitchedShuntData(version, format).readx(networkNode, context));
 
         return model;
@@ -267,8 +264,7 @@ public class PsseData {
         new ZoneData(version).write(model, context, outputStream);
         new InterareaTransferData(version).write(model, context, outputStream);
         new OwnerData(version).write(model, context, outputStream);
-
-        BlockData.writeEndOfBlockAndComment("END OF FACTS CONTROL DEVICE DATA, BEGIN SWITCHED SHUNT DATA", outputStream);
+        new FactsDeviceData(version).write(model, context, outputStream);
         new SwitchedShuntData(version).write(model, context, outputStream);
         BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
     }
@@ -334,11 +330,14 @@ public class PsseData {
         if (!tableDataIsEmpty(tableData)) {
             network.setOwner(tableData);
         }
+        tableData = new FactsDeviceData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setFacts(tableData);
+        }
         tableData = new SwitchedShuntData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setSwshunt(tableData);
         }
-
         JsonModel jsonModel = new JsonModel(network);
         String json = BlockData.writexJsonModel(jsonModel);
         String adjustedJson = StringUtils.replaceEach(json, new String[] {"\"[", "]\"", "\\\""}, new String[] {"[", "]", "\""});

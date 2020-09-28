@@ -42,6 +42,8 @@ public class PsseRawModel {
 
     private final List<PsseOwner> owners = new ArrayList<>();
 
+    private final List<PsseFacts> facts = new ArrayList<>();
+
     private final List<PsseSwitchedShunt> switchedShunts = new ArrayList<>();
 
     public PsseRawModel(PsseCaseIdentification caseIdentification) {
@@ -146,6 +148,14 @@ public class PsseRawModel {
 
     public List<PsseOwner> getOwners() {
         return owners;
+    }
+
+    public void addFacts(List<PsseFacts> facts) {
+        this.facts.addAll(facts);
+    }
+
+    public List<PsseFacts> getFacts() {
+        return facts;
     }
 
     public void addSwitchedShunts(List<PsseSwitchedShunt> switchedShunts) {
