@@ -31,6 +31,7 @@ public class PsseContext {
     private String[] ownerDataReadFields;
     private String[] factsDeviceDataReadFields;
     private String[] switchedShuntDataReadFields;
+    private String[] gneDeviceDataReadFields;
 
     PsseContext() {
     }
@@ -177,5 +178,13 @@ public class PsseContext {
 
     public String[] getSwitchedShuntDataReadFields() {
         return this.switchedShuntDataReadFields;
+    }
+
+    public void setGneDeviceDataReadFields(String[] fields) {
+        this.gneDeviceDataReadFields = fields;
+    }
+
+    public String[] getGneDeviceDataReadFields() {
+        return this.gneDeviceDataReadFields;
     }
 }

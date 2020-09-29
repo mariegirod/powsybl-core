@@ -45,6 +45,7 @@ public class JsonModel {
         private TableData owner;
         private TableData facts;
         private TableData swshunt;
+        private TableData gne;
 
         void setCaseid(ArrayData caseid) {
             this.caseid = caseid;
@@ -164,6 +165,14 @@ public class JsonModel {
 
         public TableData getSwshunt() {
             return this.swshunt;
+        }
+
+        void setGne(TableData gne) {
+            this.gne = gne;
+        }
+
+        public TableData getGne() {
+            return this.gne;
         }
     }
 

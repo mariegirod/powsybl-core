@@ -46,6 +46,8 @@ public class PsseRawModel {
 
     private final List<PsseSwitchedShunt> switchedShunts = new ArrayList<>();
 
+    private final List<PsseGneDevice> gneDevice = new ArrayList<>();
+
     public PsseRawModel(PsseCaseIdentification caseIdentification) {
         this.caseIdentification = Objects.requireNonNull(caseIdentification);
     }
@@ -164,5 +166,13 @@ public class PsseRawModel {
 
     public List<PsseSwitchedShunt> getSwitchedShunts() {
         return switchedShunts;
+    }
+
+    public void addGneDevice(List<PsseGneDevice> gneDevice) {
+        this.gneDevice.addAll(gneDevice);
+    }
+
+    public List<PsseGneDevice> getGneDevice() {
+        return gneDevice;
     }
 }

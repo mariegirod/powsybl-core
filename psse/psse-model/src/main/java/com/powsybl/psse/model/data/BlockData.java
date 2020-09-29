@@ -171,6 +171,14 @@ class BlockData {
         return writer.processRecordsToString(modelRecords);
     }
 
+    static <T> String writeBlock(Class<T> aClass, T modelRecord, String[] headers, String[] quoteFields,
+        char delimiter) {
+
+        CsvWriterSettings settings = writeBlockSettings(aClass, headers, quoteFields, delimiter, '\'');
+        CsvWriter writer = new CsvWriter(settings);
+        return writer.processRecordToString(modelRecord);
+    }
+
     private static <T> CsvWriterSettings writeBlockSettings(Class<T> aClass, String[] headers,
         String[] quoteFields, char delimiter, char quote) {
 

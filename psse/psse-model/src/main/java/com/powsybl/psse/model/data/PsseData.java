@@ -161,9 +161,7 @@ public class PsseData {
         model.addOwners(new OwnerData(version).read(reader, context));
         model.addFacts(new FactsDeviceData(version).read(reader, context));
         model.addSwitchedShunts(new SwitchedShuntData(version).read(reader, context));
-
-        // gne device data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
+        model.addGneDevice(new GneDeviceData(version).read(reader, context));
 
         // Induction Machine data
         BlockData.readDiscardedRecordBlock(reader); // TODO
@@ -198,6 +196,7 @@ public class PsseData {
         model.addOwners(new OwnerData(version, format).readx(networkNode, context));
         model.addFacts(new FactsDeviceData(version, format).readx(networkNode, context));
         model.addSwitchedShunts(new SwitchedShuntData(version, format).readx(networkNode, context));
+        model.addGneDevice(new GneDeviceData(version, format).readx(networkNode, context));
 
         return model;
     }
@@ -266,7 +265,7 @@ public class PsseData {
         new OwnerData(version).write(model, context, outputStream);
         new FactsDeviceData(version).write(model, context, outputStream);
         new SwitchedShuntData(version).write(model, context, outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF GNE DEVICE DATA, BEGIN INDUCTION MACHINE DATA", outputStream);
+        new GneDeviceData(version).write(model, context, outputStream);
     }
 
     // writex
@@ -337,6 +336,10 @@ public class PsseData {
         tableData = new SwitchedShuntData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setSwshunt(tableData);
+        }
+        tableData = new GneDeviceData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setGne(tableData);
         }
         JsonModel jsonModel = new JsonModel(network);
         String json = BlockData.writexJsonModel(jsonModel);
