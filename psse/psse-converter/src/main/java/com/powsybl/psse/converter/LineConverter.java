@@ -9,12 +9,14 @@ package com.powsybl.psse.converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.powsybl.iidm.network.CurrentLimitsAdder;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.iidm.network.util.ContainersMapping;
 import com.powsybl.psse.converter.PsseImporter.PerUnitContext;
 import com.powsybl.psse.model.PsseNonTransformerBranch;
+import com.powsybl.psse.model.PsseNonTransformerBranch35;
 
 /**
  * @author Luma Zamarreño <zamarrenolm at aia.es>
@@ -36,7 +38,6 @@ public class LineConverter extends AbstractConverter {
         String voltageLevel1Id = getContainersMapping().getVoltageLevelId(psseLine.getI());
         String voltageLevel2Id = getContainersMapping().getVoltageLevelId(psseLine.getJ());
         VoltageLevel voltageLevel2 = getNetwork().getVoltageLevel(voltageLevel2Id);
-        double zb = voltageLevel2.getNominalV() * voltageLevel2.getNominalV() / perUnitContext.getSb();
 
         Line line = getNetwork().newLine()
             .setId(id)
@@ -45,12 +46,12 @@ public class LineConverter extends AbstractConverter {
             .setVoltageLevel1(voltageLevel1Id)
             .setConnectableBus2(bus2Id)
             .setVoltageLevel2(voltageLevel2Id)
-            .setR(psseLine.getR() * zb)
-            .setX(psseLine.getX() * zb)
-            .setG1(psseLine.getGi() / zb)
-            .setB1(psseLine.getB() / zb / 2 + psseLine.getBi() / zb)
-            .setG2(psseLine.getGj() / zb)
-            .setB2(psseLine.getB() / zb / 2 + psseLine.getBj() / zb)
+            .setR(impedanceToEngineeringUnits(psseLine.getR(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setX(impedanceToEngineeringUnits(psseLine.getX(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setG1(admittanceToEngineeringUnits(psseLine.getGi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setB1(admittanceToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setG2(admittanceToEngineeringUnits(psseLine.getGj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setB2(admittanceToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
             .add();
 
         if (psseLine.getSt() == 1) {
@@ -58,8 +59,35 @@ public class LineConverter extends AbstractConverter {
             line.getTerminal2().connect();
         }
 
+        VoltageLevel voltageLevel1 = getNetwork().getVoltageLevel(voltageLevel1Id);
+        defineOperationalLimits(line, voltageLevel1.getNominalV(), voltageLevel2.getNominalV());
         if (psseLine.getGi() != 0 || psseLine.getGj() != 0) {
             LOGGER.warn("Branch G not supported ({})", psseLine.getI());
+        }
+    }
+
+    private void defineOperationalLimits(Line line, double vnom1, double vnom2) {
+        double rateMva;
+        if (psseLine instanceof PsseNonTransformerBranch35) {
+            rateMva = ((PsseNonTransformerBranch35) psseLine).getRate1();
+        } else {
+            rateMva = psseLine.getRatea();
+        }
+
+        double currentLimit1 = rateMva / (Math.sqrt(3.0) * vnom1);
+        double currentLimit2 = rateMva / (Math.sqrt(3.0) * vnom2);
+
+        // CurrentPermanentLimit in A
+        if (currentLimit1 > 0) {
+            CurrentLimitsAdder currentLimitFrom = line.newCurrentLimits1();
+            currentLimitFrom.setPermanentLimit(currentLimit1 * 1000);
+            currentLimitFrom.add();
+        }
+
+        if (currentLimit2 > 0) {
+            CurrentLimitsAdder currentLimitTo = line.newCurrentLimits2();
+            currentLimitTo.setPermanentLimit(currentLimit2 * 1000);
+            currentLimitTo.add();
         }
     }
 
