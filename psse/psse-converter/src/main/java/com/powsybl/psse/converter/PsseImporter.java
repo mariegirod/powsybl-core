@@ -156,7 +156,7 @@ public class PsseImporter implements Importer {
             }
 
             for (PsseGenerator psseGen : psseModel.getGenerators()) {
-                new GeneratorConverter(psseGen, containersMapping, network).create(busNumToPsseBus.get(psseGen.getI()));
+                new GeneratorConverter(psseGen, containersMapping, network).create();
             }
 
             for (PsseNonTransformerBranch psseLine : psseModel.getNonTransformerBranches()) {
@@ -173,6 +173,10 @@ public class PsseImporter implements Importer {
             // Add controls
             for (PsseSwitchedShunt psseSwShunt : psseModel.getSwitchedShunts()) {
                 new SwitchedShuntCompensatorConverter(psseSwShunt, containersMapping, network).addControl();
+            }
+            for (PsseGenerator psseGen : psseModel.getGenerators()) {
+                new GeneratorConverter(psseGen, containersMapping, network)
+                    .addControl(busNumToPsseBus.get(psseGen.getI()));
             }
 
             return network;
