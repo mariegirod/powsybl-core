@@ -87,7 +87,7 @@ public class SwitchedShuntCompensatorConverter extends AbstractConverter {
         boolean voltageRegulatorOn = false;
         double targetDeadband = 0.0;
         if (targetV != 0.0) {
-            targetDeadband = (vHigh - vLow) / targetV;
+            targetDeadband = vHigh - vLow;
             voltageRegulatorOn = psseVoltageRegulatorOn;
         }
 
