@@ -57,7 +57,7 @@ public class TransformerConverter extends AbstractConverter {
 
     private void createTwoWindingsTransformer() {
 
-        String id = "T-" + psseTransformer.getI() + "-" + psseTransformer.getJ() + "-" + psseTransformer.getCkt();
+        String id = getTransformerId(psseTransformer.getI(), psseTransformer.getJ(), psseTransformer.getCkt());
 
         String bus1Id = getBusId(psseTransformer.getI());
         String voltageLevel1Id = getContainersMapping().getVoltageLevelId(psseTransformer.getI());
@@ -118,7 +118,7 @@ public class TransformerConverter extends AbstractConverter {
     }
 
     private void createThreeWindingsTransformer() {
-        String id = "T-" + psseTransformer.getI() + "-" + psseTransformer.getJ() + "-" + psseTransformer.getK() + "-" + psseTransformer.getCkt();
+        String id = getTransformerId(psseTransformer.getI(), psseTransformer.getJ(), psseTransformer.getK(), psseTransformer.getCkt());
 
         String bus1Id = getBusId(psseTransformer.getI());
         String voltageLevel1Id = getContainersMapping().getVoltageLevelId(psseTransformer.getI());
@@ -594,7 +594,7 @@ public class TransformerConverter extends AbstractConverter {
     }
 
     private void addControlTwoWindingsTransformer() {
-        String id = "T-" + psseTransformer.getI() + "-" + psseTransformer.getJ() + "-" + psseTransformer.getCkt();
+        String id = getTransformerId(psseTransformer.getI(), psseTransformer.getJ(), psseTransformer.getCkt());
         TwoWindingsTransformer twt = getNetwork().getTwoWindingsTransformer(id);
         if (twt == null) {
             return;
@@ -611,7 +611,7 @@ public class TransformerConverter extends AbstractConverter {
     }
 
     private void addControlThreeWindingsTransformer() {
-        String id = "T-" + psseTransformer.getI() + "-" + psseTransformer.getJ() + "-" + psseTransformer.getK() + "-" + psseTransformer.getCkt();
+        String id = getTransformerId(psseTransformer.getI(), psseTransformer.getJ(), psseTransformer.getK(), psseTransformer.getCkt());
         ThreeWindingsTransformer twt = getNetwork().getThreeWindingsTransformer(id);
         if (twt == null) {
             return;
@@ -714,6 +714,14 @@ public class TransformerConverter extends AbstractConverter {
                 + regulatingBusId + ". Unexpected regulatingTerminal.");
         }
         return regulatingTerminal;
+    }
+
+    private static String getTransformerId(int i, int j, String ckt) {
+        return "T-" + i + "-" + j + "-" + ckt;
+    }
+
+    private static String getTransformerId(int i, int j, int k, String ckt) {
+        return "T-" + i + "-" + j + "-" + k + "-" + ckt;
     }
 
     private final PsseTransformer psseTransformer;
