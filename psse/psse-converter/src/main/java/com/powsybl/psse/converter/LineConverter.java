@@ -46,12 +46,12 @@ public class LineConverter extends AbstractConverter {
             .setVoltageLevel1(voltageLevel1Id)
             .setConnectableBus2(bus2Id)
             .setVoltageLevel2(voltageLevel2Id)
-            .setR(impedanceToEngineeringUnits(psseLine.getR(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
-            .setX(impedanceToEngineeringUnits(psseLine.getX(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
-            .setG1(admittanceToEngineeringUnits(psseLine.getGi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
-            .setB1(admittanceToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
-            .setG2(admittanceToEngineeringUnits(psseLine.getGj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
-            .setB2(admittanceToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setR(impedance1ToEngineeringUnits(psseLine.getR(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setX(impedance1ToEngineeringUnits(psseLine.getX(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setG1(admittance1ToEngineeringUnits(psseLine.getGi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setB1(admittance1ToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBi(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setG2(admittance1ToEngineeringUnits(psseLine.getGj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
+            .setB2(admittance1ToEngineeringUnits(psseLine.getB() * 0.5 + psseLine.getBj(), voltageLevel2.getNominalV(), perUnitContext.getSb()))
             .add();
 
         if (psseLine.getSt() == 1) {

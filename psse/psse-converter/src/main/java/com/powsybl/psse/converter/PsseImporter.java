@@ -178,6 +178,11 @@ public class PsseImporter implements Importer {
                 new GeneratorConverter(psseGen, containersMapping, network)
                     .addControl(busNumToPsseBus.get(psseGen.getI()));
             }
+            for (PsseTransformer psseTransformer : psseModel.getTransformers()) {
+                new TransformerConverter(psseTransformer, containersMapping, perUnitContext, network, busNumToPsseBus,
+                    psseModel.getCaseIdentification().getSbase())
+                        .addControl();
+            }
 
             return network;
         } catch (IOException e) {

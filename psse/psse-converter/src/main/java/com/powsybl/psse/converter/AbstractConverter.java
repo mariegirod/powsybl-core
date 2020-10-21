@@ -6,6 +6,8 @@
  */
 package com.powsybl.psse.converter;
 
+import org.apache.commons.math3.complex.Complex;
+
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.util.ContainersMapping;
 
@@ -32,11 +34,19 @@ public abstract class AbstractConverter {
         return "B" + busNum;
     }
 
-    public static double impedanceToEngineeringUnits(double impedance, double vnom, double sbase) {
+    public static Complex impedanceToEngineeringUnits(Complex impedance, double vnom, double sbase) {
+        return impedance.multiply(vnom * vnom / sbase);
+    }
+
+    public static double impedance1ToEngineeringUnits(double impedance, double vnom, double sbase) {
         return impedance * vnom * vnom / sbase;
     }
 
-    public static double admittanceToEngineeringUnits(double admittance, double vnom, double sbase) {
+    public static Complex admittanceToEngineeringUnits(Complex admittance, double vnom, double sbase) {
+        return admittance.multiply(sbase / (vnom * vnom));
+    }
+
+    public static double admittance1ToEngineeringUnits(double admittance, double vnom, double sbase) {
         return admittance * sbase / (vnom * vnom);
     }
 
