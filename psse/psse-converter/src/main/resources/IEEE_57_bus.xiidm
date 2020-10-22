@@ -48,7 +48,7 @@
             </iidm:busBreakerTopology>
             <iidm:load id="B18-L1 " loadType="UNDEFINED" p0="27.2" q0="9.8" bus="B18" connectableBus="B18"/>
             <iidm:shunt id="B18-SH 1" sectionCount="1" voltageRegulatorOn="false" bus="B18" connectableBus="B18">
-                <iidm:shuntLinearModel bPerSection="10.0" gPerSection="0.0" maximumSectionCount="1"/>
+                <iidm:shuntLinearModel bPerSection="5.250997689561017E-4" gPerSection="0.0" maximumSectionCount="1"/>
             </iidm:shunt>
         </iidm:voltageLevel>
         <iidm:twoWindingsTransformer id="T-4-18-1 " r="0.0" x="81.8892" g="0.0" b="0.0" ratedU1="138.0" ratedU2="138.0" bus1="B4" connectableBus1="B4" voltageLevelId1="VL4" bus2="B18" connectableBus2="B18" voltageLevelId2="VL18">
@@ -331,7 +331,7 @@
             </iidm:busBreakerTopology>
             <iidm:load id="B25-L1 " loadType="UNDEFINED" p0="6.3" q0="3.2" bus="B25" connectableBus="B25"/>
             <iidm:shunt id="B25-SH 1" sectionCount="1" voltageRegulatorOn="false" bus="B25" connectableBus="B25">
-                <iidm:shuntLinearModel bPerSection="5.9" gPerSection="0.0" maximumSectionCount="1"/>
+                <iidm:shuntLinearModel bPerSection="3.098088636841E-4" gPerSection="0.0" maximumSectionCount="1"/>
             </iidm:shunt>
         </iidm:voltageLevel>
     </iidm:substation>
@@ -513,7 +513,7 @@
             </iidm:busBreakerTopology>
             <iidm:load id="B53-L1 " loadType="UNDEFINED" p0="20.0" q0="10.0" bus="B53" connectableBus="B53"/>
             <iidm:shunt id="B53-SH 1" sectionCount="1" voltageRegulatorOn="false" bus="B53" connectableBus="B53">
-                <iidm:shuntLinearModel bPerSection="6.3" gPerSection="0.0" maximumSectionCount="1"/>
+                <iidm:shuntLinearModel bPerSection="3.30812854442344E-4" gPerSection="0.0" maximumSectionCount="1"/>
             </iidm:shunt>
         </iidm:voltageLevel>
     </iidm:substation>
