@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.CurrentLimitsAdder;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
 import com.powsybl.iidm.network.PhaseTapChangerAdder;
@@ -31,6 +32,8 @@ import com.powsybl.psse.model.PsseBus;
 import com.powsybl.psse.model.PsseException;
 import com.powsybl.psse.model.PsseTransformer;
 import com.powsybl.psse.model.PsseTransformer.WindingRecord;
+import com.powsybl.psse.model.PsseTransformer35;
+import com.powsybl.psse.model.PsseTransformer35.WindingRecord35;
 
 /**
  * @author Luma Zamarreño <zamarrenolm at aia.es>
@@ -110,6 +113,7 @@ public class TransformerConverter extends AbstractConverter {
             .add();
 
         tapChangerToIidm(tapChanger, twt);
+        defineOperationalLimits(twt, voltageLevel1.getNominalV(), voltageLevel2.getNominalV());
 
         if (psseTransformer.getStat() == 1) {
             twt.getTerminal1().connect();
@@ -210,6 +214,7 @@ public class TransformerConverter extends AbstractConverter {
             .add();
 
         tapChangersToIidm(tapChanger1, tapChanger2, tapChanger3, twt);
+        defineOperationalLimits(twt, voltageLevel1.getNominalV(), voltageLevel2.getNominalV(), voltageLevel3.getNominalV());
 
         if (psseTransformer.getStat() == 1) {
             twt.getLeg1().getTerminal().connect();
@@ -475,6 +480,83 @@ public class TransformerConverter extends AbstractConverter {
         });
 
         return tapChanger;
+    }
+
+    private void defineOperationalLimits(TwoWindingsTransformer twt, double vnom1, double vnom2) {
+        double rateMva = getRateWinding1();
+
+        double currentLimit1 = rateMva / (Math.sqrt(3.0) * vnom1);
+        double currentLimit2 = rateMva / (Math.sqrt(3.0) * vnom2);
+
+        // CurrentPermanentLimit in A
+        if (currentLimit1 > 0) {
+            CurrentLimitsAdder currentLimitFrom = twt.newCurrentLimits1();
+            currentLimitFrom.setPermanentLimit(currentLimit1 * 1000);
+            currentLimitFrom.add();
+        }
+
+        if (currentLimit2 > 0) {
+            CurrentLimitsAdder currentLimitTo = twt.newCurrentLimits2();
+            currentLimitTo.setPermanentLimit(currentLimit2 * 1000);
+            currentLimitTo.add();
+        }
+    }
+
+    private void defineOperationalLimits(ThreeWindingsTransformer twt, double vnom1, double vnom2, double vnom3) {
+        double rateMva1 = getRateWinding1();
+        double rateMva2 = getRateWinding2();
+        double rateMva3 = getRateWinding3();
+
+        double currentLimit1 = rateMva1 / (Math.sqrt(3.0) * vnom1);
+        double currentLimit2 = rateMva2 / (Math.sqrt(3.0) * vnom2);
+        double currentLimit3 = rateMva3 / (Math.sqrt(3.0) * vnom3);
+
+        // CurrentPermanentLimit in A
+        if (currentLimit1 > 0) {
+            CurrentLimitsAdder currentLimitFrom = twt.getLeg1().newCurrentLimits();
+            currentLimitFrom.setPermanentLimit(currentLimit1 * 1000);
+            currentLimitFrom.add();
+        }
+        if (currentLimit2 > 0) {
+            CurrentLimitsAdder currentLimitFrom = twt.getLeg2().newCurrentLimits();
+            currentLimitFrom.setPermanentLimit(currentLimit2 * 1000);
+            currentLimitFrom.add();
+        }
+        if (currentLimit3 > 0) {
+            CurrentLimitsAdder currentLimitFrom = twt.getLeg3().newCurrentLimits();
+            currentLimitFrom.setPermanentLimit(currentLimit3 * 1000);
+            currentLimitFrom.add();
+        }
+    }
+
+    private double getRateWinding1() {
+        double rateMva;
+        if (psseTransformer instanceof PsseTransformer35) {
+            rateMva = ((WindingRecord35) ((PsseTransformer35) psseTransformer).getWindingRecord1()).getRate1();
+        } else {
+            rateMva = psseTransformer.getWindingRecord1().getRata();
+        }
+        return rateMva;
+    }
+
+    private double getRateWinding2() {
+        double rateMva;
+        if (psseTransformer instanceof PsseTransformer35) {
+            rateMva = ((WindingRecord35) ((PsseTransformer35) psseTransformer).getWindingRecord2()).getRate1();
+        } else {
+            rateMva = psseTransformer.getWindingRecord2().getRata();
+        }
+        return rateMva;
+    }
+
+    private double getRateWinding3() {
+        double rateMva;
+        if (psseTransformer instanceof PsseTransformer35) {
+            rateMva = ((WindingRecord35) ((PsseTransformer35) psseTransformer).getWindingRecord3()).getRate1();
+        } else {
+            rateMva = psseTransformer.getWindingRecord3().getRata();
+        }
+        return rateMva;
     }
 
     static class TapChanger {
