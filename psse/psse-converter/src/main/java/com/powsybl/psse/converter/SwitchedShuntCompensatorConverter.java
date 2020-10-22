@@ -56,7 +56,7 @@ public class SwitchedShuntCompensatorConverter extends AbstractConverter {
             for (int i = 0; i < shuntBlock.getN(); i++) {
                 modelAdder.beginSection()
                     .setG(0.0)
-                    .setB(shuntBlock.getB())
+                    .setB(powerToShuntAdmittance(shuntBlock.getB(), voltageLevel.getNominalV()))
                     .endSection();
             }
         });
