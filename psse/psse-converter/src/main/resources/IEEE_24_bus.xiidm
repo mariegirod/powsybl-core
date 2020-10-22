@@ -12,7 +12,7 @@
             <iidm:shunt id="B1-SwSH-1" sectionCount="2" voltageRegulatorOn="false" targetV="137.31" targetDeadband="1.3799999999999955" bus="B1" connectableBus="B1">
                 <iidm:shuntNonLinearModel>
                     <iidm:section b="0.0" g="0.0"/>
-                    <iidm:section b="120.0" g="0.0"/>
+                    <iidm:section b="0.00630119722747322" g="0.0"/>
                 </iidm:shuntNonLinearModel>
             </iidm:shunt>
         </iidm:voltageLevel>
@@ -113,7 +113,7 @@
             <iidm:shunt id="B6-SwSH-1" sectionCount="2" voltageRegulatorOn="false" targetV="137.31" targetDeadband="1.3799999999999955" bus="B6" connectableBus="B6">
                 <iidm:shuntNonLinearModel>
                     <iidm:section b="0.0" g="0.0"/>
-                    <iidm:section b="100.0" g="0.0"/>
+                    <iidm:section b="0.005250997689561016" g="0.0"/>
                 </iidm:shuntNonLinearModel>
                 <iidm:regulatingTerminal id="B6-L1 "/>
             </iidm:shunt>
