@@ -21,18 +21,18 @@ public class NetworkDiffResults {
     final String networkId2;
 
     final List<DiffResult> vlDiffs;
+    final List<DiffResult> branchDiffs;
 
-    public NetworkDiffResults(String networkId1, String networkId2, List<DiffResult> vlDiffs) {
-        Objects.requireNonNull(networkId1);
-        Objects.requireNonNull(networkId2);
-        Objects.requireNonNull(vlDiffs);
-        this.networkId1 = networkId1;
-        this.networkId2 = networkId2;
-        this.vlDiffs = vlDiffs;
+    public NetworkDiffResults(String networkId1, String networkId2, List<DiffResult> vlDiffs, List<DiffResult> branchDiffs) {
+        this.networkId1 = Objects.requireNonNull(networkId1);
+        this.networkId2 = Objects.requireNonNull(networkId2);
+        this.vlDiffs = Objects.requireNonNull(vlDiffs);
+        this.branchDiffs = Objects.requireNonNull(branchDiffs);
     }
 
     public boolean isDifferent() {
-        return vlDiffs.stream().anyMatch(DiffResult::isDifferent);
+        return vlDiffs.stream().anyMatch(DiffResult::isDifferent)
+                || branchDiffs.stream().anyMatch(DiffResult::isDifferent);
     }
 
     void writeJson(JsonGenerator generator) {
@@ -43,6 +43,8 @@ public class NetworkDiffResults {
             generator.writeStringField("network2", networkId2);
             generator.writeFieldName("diff.VoltageLevels");
             NetworkDiff.writeJson(generator, vlDiffs);
+            generator.writeFieldName("diff.Branches");
+            NetworkDiff.writeJson(generator, branchDiffs);
             generator.writeEndObject();
         } catch (IOException e) {
             throw new UncheckedIOException(e);

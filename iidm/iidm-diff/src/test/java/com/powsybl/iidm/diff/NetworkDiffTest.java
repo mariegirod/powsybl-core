@@ -6,21 +6,26 @@
  */
 package com.powsybl.iidm.diff;
 
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
-import com.powsybl.commons.config.InMemoryPlatformConfig;
-import com.powsybl.commons.config.MapModuleConfig;
-import com.powsybl.iidm.network.Network;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
+import com.powsybl.commons.config.InMemoryPlatformConfig;
+import com.powsybl.commons.config.MapModuleConfig;
+import com.powsybl.iidm.network.Network;
 
 /**
  * @author Christian Biasuzzi <christian.biasuzzi@techrain.eu>
@@ -88,17 +93,27 @@ public class NetworkDiffTest {
     @Test
     public void testDifferencesSpecificVoltageLevel() {
         NetworkDiff ndiff = new NetworkDiff(config);
-        NetworkDiffResults noDiffVl = ndiff.diff(network1, network2, "VLGEN");
+        NetworkDiff.DiffEquipment diffEquipment = ndiff.new DiffEquipment();
+        diffEquipment.setVoltageLevels(Collections.singletonList("VLGEN"));
+        diffEquipment.setBranches(Collections.singletonList("NGEN_NHV1"));
+        NetworkDiffResults noDiffVl = ndiff.diff(network1, network2, diffEquipment);
         assertFalse(noDiffVl.isDifferent());
 
-        NetworkDiffResults diffVl = ndiff.diff(network1, network2, "VLHV2");
+        diffEquipment.setVoltageLevels(Collections.singletonList("VLHV2"));
+        NetworkDiffResults diffVl = ndiff.diff(network1, network2, diffEquipment);
         assertTrue(diffVl.isDifferent());
         assertNotNull(NetworkDiff.writeJson(diffVl));
+
+        diffEquipment.setVoltageLevels(Collections.singletonList("VLGEN"));
+        diffEquipment.setBranches(Collections.singletonList("NHV1_NHV2_2"));
+        NetworkDiffResults diffBranch = ndiff.diff(network1, network2, diffEquipment);
+        assertTrue(diffBranch.isDifferent());
+        assertNotNull(NetworkDiff.writeJson(diffBranch));
     }
 
     @Test
     public void testDifferencesChangeThreshold() {
-        config.setGenericTreshold(100.0);
+        config.setGenericTreshold(120.0);
         NetworkDiff ndiff = new NetworkDiff(config);
         NetworkDiffResults ndifr = ndiff.diff(network1, network2);
         assertFalse(ndifr.isDifferent());
