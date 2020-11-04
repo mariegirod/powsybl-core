@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -398,6 +399,24 @@ public class PsseRawReaderTest {
         String[] expectedSwitchedShuntDataReadFields = new String[] {"i", "id", "modsw", "adjm", "stat", "vswhi", "vswlo", "swreg", "nreg", "rmpct", "rmidnt", "binit", "s1", "n1", "b1"};
         String[] actualSwitchedShuntDataReadFields = context.getSwitchedShuntDataReadFields();
         assertTrue(compareReadFields(expectedSwitchedShuntDataReadFields, actualSwitchedShuntDataReadFields));
+    }
+
+    @Test
+    public void invalidIeee14BusTest() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/Invalid_IEEE_14_bus.raw")))) {
+            PsseRawModel rawData = new PsseRawReader().read(reader);
+            assertNotNull(rawData);
+            PsseValidation psseValidation = new PsseValidation(rawData);
+            List<String> warnings = psseValidation.getWarnings();
+            StringBuilder sb = new StringBuilder();
+            warnings.forEach(warning -> {
+                String s = String.format("%s%n", warning);
+                sb.append(s);
+            });
+            String warningsRef = new String(ByteStreams.toByteArray(getClass().getResourceAsStream("/Invalid_IEEE_14_bus.txt")), StandardCharsets.UTF_8);
+            assertEquals(warningsRef, sb.toString());
+            assertFalse(psseValidation.isValidCase());
+        }
     }
 
     private boolean compareReadFields(String[] expected, String[] actual) {
