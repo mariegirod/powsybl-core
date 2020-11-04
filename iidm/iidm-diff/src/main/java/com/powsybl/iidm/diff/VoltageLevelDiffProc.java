@@ -87,10 +87,11 @@ class VoltageLevelDiffProc implements DiffProc<VoltageLevel> {
 
     @Override
     public DiffResult diff(VoltageLevel vl1, VoltageLevel vl2) {
-        double maxV1 = vl1.getBusView().getBusStream().mapToDouble(Bus::getV).max().orElse(0);
-        double minV1 = vl1.getBusView().getBusStream().mapToDouble(Bus::getV).min().orElse(0);
-        double maxV2 = vl2.getBusView().getBusStream().mapToDouble(Bus::getV).max().orElse(0);
-        double minV2 = vl2.getBusView().getBusStream().mapToDouble(Bus::getV).min().orElse(0);
+        double maxV1 = vl1.getBusView().getBusStream().mapToDouble(Bus::getV).filter(v -> !Double.isNaN(v)).max().orElse(0);
+        double minV1 = vl1.getBusView().getBusStream().mapToDouble(Bus::getV).filter(v -> !Double.isNaN(v)).min().orElse(0);
+        double maxV2 = vl2.getBusView().getBusStream().mapToDouble(Bus::getV).filter(v -> !Double.isNaN(v)).max().orElse(0);
+        double minV2 = vl2.getBusView().getBusStream().mapToDouble(Bus::getV).filter(v -> !Double.isNaN(v)).min().orElse(0);
+
         long noBusesVl1 = vl1.getBusView().getBusStream().count();
         long noBusesVl2 = vl2.getBusView().getBusStream().count();
 

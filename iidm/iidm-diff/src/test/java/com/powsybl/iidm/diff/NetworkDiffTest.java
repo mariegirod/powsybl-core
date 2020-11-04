@@ -45,6 +45,9 @@ public class NetworkDiffTest {
     private Network network5;
     private Network network6;
 
+    private Network network7;
+    private Network network8;
+
     private DiffConfig config;
 
     private void checkValues(DiffConfig config, double genericThreshold, boolean filterDifferent) {
@@ -68,6 +71,9 @@ public class NetworkDiffTest {
 
         network5 = NetworkDiffTestUtils.createNetwork5();
         network6 = NetworkDiffTestUtils.createNetwork6();
+
+        network7 = NetworkDiffTestUtils.createNetwork7();
+        network8 = NetworkDiffTestUtils.createNetwork8();
     }
 
     @After
@@ -172,4 +178,13 @@ public class NetworkDiffTest {
         DiffConfig config = DiffConfig.load(platformConfig);
         checkValues(config, genericThreshold, true);
     }
+
+    @Test
+    public void testDifferencesWithNan() {
+        NetworkDiff ndiff = new NetworkDiff(config);
+        NetworkDiffResults ndifr = ndiff.diff(network7, network8);
+        assertTrue(ndifr.isDifferent());
+        assertNotNull(NetworkDiff.writeJson(ndifr));
+    }
+
 }

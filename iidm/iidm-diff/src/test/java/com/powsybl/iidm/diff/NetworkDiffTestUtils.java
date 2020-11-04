@@ -67,4 +67,16 @@ public final class NetworkDiffTestUtils {
         return network;
     }
 
+    public static Network createNetwork7() {
+        Network network = NetworkDiffTestUtils.createNetwork2();
+        network.getBusView().getBus("VLGEN_0").setV(Double.NaN);
+        return network;
+    }
+
+    public static Network createNetwork8() {
+        Network network = NetworkDiffTestUtils.createNetwork2();
+        network.getBusView().getBus("VLHV1_0").setV(Double.NaN);
+        return network;
+    }
+
 }
