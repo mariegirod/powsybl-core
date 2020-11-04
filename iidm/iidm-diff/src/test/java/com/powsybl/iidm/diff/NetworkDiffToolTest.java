@@ -48,7 +48,7 @@ public class NetworkDiffToolTest extends AbstractToolTest {
         Command cmd = tool.getCommand();
         assertEquals("Computation", cmd.getTheme());
         assertEquals("Compare two networks", cmd.getDescription());
-        assertCommand(cmd, "compare-network", 4, 3);
+        assertCommand(cmd, "compare-network", 5, 3);
         assertOption(cmd.getOptions(), "input-file1", true, true);
         assertOption(cmd.getOptions(), "input-file2", true, true);
         assertOption(cmd.getOptions(), "output-file", true, true);
