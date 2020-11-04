@@ -164,13 +164,8 @@ public class PsseValidation {
                 warnings.add(String.format(Locale.US, "Generator: %d %s Unexpected Pmin: %.2f Pmax: %.2f", generator.getI(), generator.getId(), generator.getPb(), generator.getPt()));
                 validCase = false;
             }
-            PsseBus regulatingBus = getRegulatingBus(psseBuses, buses, generator.getIreg(), generator.getI());
-            if (regulatingBus != null
-                && (regulatingBus.getIde() == 1 || regulatingBus.getIde() == 2 || regulatingBus.getIde() == 3)
-                && generator.getVs() <= 0.0) {
-                warnings.add(String.format(Locale.US, "Generator: %d %s Unexpected Voltage setpoint: %.2f", generator.getI(), generator.getId(), generator.getVs()));
-                validCase = false;
-            }
+            validateGeneratorRegulatingBus(psseBuses, buses, generator);
+
             addBusesMap(busesGenerators, generator.getI(), generator.getId());
         }
 
@@ -179,6 +174,16 @@ public class PsseValidation {
             duplicatedBusesGenerators.forEach((key, value) -> warnings
                 .add(String.format("Generator: Multiple generators (%d) at bus %d with the same Id %s", value.size(),
                     Integer.valueOf(key), value.get(0))));
+            validCase = false;
+        }
+    }
+
+    private void validateGeneratorRegulatingBus(List<PsseBus> psseBuses,  Map<Integer, List<Integer>> buses, PsseGenerator generator) {
+        PsseBus regulatingBus = getRegulatingBus(psseBuses, buses, generator.getIreg(), generator.getI());
+        if (regulatingBus != null
+            && (regulatingBus.getIde() == 1 || regulatingBus.getIde() == 2 || regulatingBus.getIde() == 3)
+            && generator.getVs() <= 0.0) {
+            warnings.add(String.format(Locale.US, "Generator: %d %s Unexpected Voltage setpoint: %.2f", generator.getI(), generator.getId(), generator.getVs()));
             validCase = false;
         }
     }
@@ -228,22 +233,12 @@ public class PsseValidation {
 
         for (int i = 0; i < transformers.size(); i++) {
             PsseTransformer transformer = transformers.get(i);
-            if (!buses.containsKey(transformer.getI())) {
-                warnings.add(String.format("Transformer: Unexpected I: %d", transformer.getI()));
-                validCase = false;
-            }
-            if (!buses.containsKey(transformer.getJ())) {
-                warnings.add(String.format("Transformer: Unexpected J: %d", transformer.getJ()));
-                validCase = false;
-            }
-            if (transformer.getX12() == 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected X: %.5f", transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getX12()));
-                validCase = false;
-            }
-            if (transformer.getWindingRecord1().getWindv() <= 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected ratio: %.5f", transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getWindingRecord1().getWindv()));
-                validCase = false;
-            }
+            validateTransformerBus(buses, transformer.getI(), "I");
+            validateTransformerBus(buses, transformer.getJ(), "J");
+
+            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getX12(), "X");
+            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getWindingRecord1().getWindv(), "ratio");
+
             addBusesMap(busesTransformers, transformer.getI(), transformer.getJ(), transformer.getCkt());
         }
 
@@ -262,42 +257,18 @@ public class PsseValidation {
 
         for (int i = 0; i < transformers.size(); i++) {
             PsseTransformer transformer = transformers.get(i);
-            if (!buses.containsKey(transformer.getI())) {
-                warnings.add(String.format("Transformer: Unexpected I: %d", transformer.getI()));
-                validCase = false;
-            }
-            if (!buses.containsKey(transformer.getJ())) {
-                warnings.add(String.format("Transformer: Unexpected J: %d", transformer.getJ()));
-                validCase = false;
-            }
-            if (!buses.containsKey(transformer.getK())) {
-                warnings.add(String.format("Transformer: Unexpected K: %d", transformer.getK()));
-                validCase = false;
-            }
-            if (transformer.getX12() == 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected X12: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX12()));
-                validCase = false;
-            }
-            if (transformer.getX31() == 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected X31: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX31()));
-                validCase = false;
-            }
-            if (transformer.getX23() == 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected X23: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX23()));
-                validCase = false;
-            }
-            if (transformer.getWindingRecord1().getWindv() <= 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected winding1 ratio: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord1().getWindv()));
-                validCase = false;
-            }
-            if (transformer.getWindingRecord2().getWindv() <= 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected winding2 ratio: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord2().getWindv()));
-                validCase = false;
-            }
-            if (transformer.getWindingRecord3().getWindv() <= 0.0) {
-                warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected winding3 ratio: %.5f", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord3().getWindv()));
-                validCase = false;
-            }
+            validateTransformerBus(buses, transformer.getI(), "I");
+            validateTransformerBus(buses, transformer.getJ(), "J");
+            validateTransformerBus(buses, transformer.getK(), "K");
+
+            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX12(), "X12");
+            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX31(), "X31");
+            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX23(), "X23");
+
+            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord1().getWindv(), "winding1 ratio");
+            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord2().getWindv(), "winding2 ratio");
+            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord3().getWindv(), "winding3 ratio");
+
             addBusesMap(busesTransformers, transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt());
         }
 
@@ -307,6 +278,41 @@ public class PsseValidation {
                 value) -> warnings.add(String.format(
                     "Transformer: Multiple branches (%d) between buses %d, %d and %d with the same Id %s",
                     value.size(), firstBus(key), secondBus(key), thirdBus(key), value.get(0))));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerBus(Map<Integer, List<Integer>> buses, int bus, String busTag) {
+        if (!buses.containsKey(bus)) {
+            warnings.add(String.format("Transformer: Unexpected %s: %d", busTag, bus));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerX(int busI, int busJ, String ckt, double x, String xTag) {
+        if (x == 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected %s: %.5f", busI, busJ, ckt, xTag, x));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerX(int busI, int busJ, int busK, String ckt, double x, String xTag) {
+        if (x == 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected %s: %.5f", busI, busJ, busK, ckt, xTag, x));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerRatio(int busI, int busJ, String ckt, double ratio, String ratioTag) {
+        if (ratio <= 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected %s: %.5f", busI, busJ, ckt, ratioTag, ratio));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerRatio(int busI, int busJ, int busK, String ckt, double ratio, String ratioTag) {
+        if (ratio <= 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected %s: %.5f", busI, busJ, busK, ckt, ratioTag, ratio));
             validCase = false;
         }
     }
