@@ -20,6 +20,12 @@ import java.util.*;
  */
 public class CgmesExportContext {
 
+    public enum TopologicalMappingUse {
+        MAPPING_ONLY,
+        PARTIAL_MAPPING,
+        NO_MAPPING
+    }
+
     private int cimVersion = 16;
     private CgmesTopologyKind topologyKind = CgmesTopologyKind.BUS_BRANCH;
 
@@ -32,7 +38,8 @@ public class CgmesExportContext {
 
     private boolean exportBoundaryPowerFlows = false;
 
-    private Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping = new HashMap<>();
+    private final Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping = new HashMap<>();
+    private TopologicalMappingUse topologicalMappingUse = TopologicalMappingUse.NO_MAPPING;
 
     public CgmesExportContext(Network network) {
         CimCharacteristics cimCharacteristics = network.getExtension(CimCharacteristics.class);
@@ -139,13 +146,20 @@ public class CgmesExportContext {
         return CgmesNamespace.getCimNamespace(cimVersion);
     }
 
+    public CgmesExportContext setTopologicalMappingUse(TopologicalMappingUse topologicalMappingUse) {
+        this.topologicalMappingUse = Objects.requireNonNull(topologicalMappingUse);
+        return this;
+    }
+
     public Set<String> getTopologicalNodesByBusBreakerBus(String busId) {
-        if (topologyKind == CgmesTopologyKind.NODE_BREAKER) {
+        if (topologicalMappingUse == TopologicalMappingUse.MAPPING_ONLY) {
             return topologicalNodeByBusBreakerBusMapping.get(busId);
-        } else if (topologyKind == CgmesTopologyKind.BUS_BRANCH) {
+        } else if (topologicalMappingUse == TopologicalMappingUse.NO_MAPPING) {
             return Collections.singleton(busId);
+        } else if (topologicalMappingUse == TopologicalMappingUse.PARTIAL_MAPPING) {
+            return Optional.ofNullable(topologicalNodeByBusBreakerBusMapping.get(busId)).orElseGet(() -> Collections.singleton(busId));
         }
-        return Optional.ofNullable(topologicalNodeByBusBreakerBusMapping.get(busId)).orElseGet(() -> Collections.singleton(busId));
+        throw new AssertionError("Unexpected mapping use: " + topologicalMappingUse);
     }
 
     public CgmesExportContext setTopologicalNodeByBusBreakerBusMapping(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping) {
