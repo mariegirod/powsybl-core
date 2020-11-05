@@ -40,6 +40,7 @@ public class CgmesExportContext {
 
     private final Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping = new HashMap<>();
     private TopologicalMappingUse topologicalMappingUse = TopologicalMappingUse.NO_MAPPING;
+    private final Set<String> unmappedTopologicalNodes = new HashSet<>();
 
     public CgmesExportContext(Network network) {
         CimCharacteristics cimCharacteristics = network.getExtension(CimCharacteristics.class);
@@ -165,6 +166,20 @@ public class CgmesExportContext {
     public CgmesExportContext setTopologicalNodeByBusBreakerBusMapping(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping) {
         this.topologicalNodeByBusBreakerBusMapping.clear();
         this.topologicalNodeByBusBreakerBusMapping.putAll(topologicalNodeByBusBreakerBusMapping);
+        return this;
+    }
+
+    public Set<String> getUnmappedTopologicalNodes() {
+        return Collections.unmodifiableSet(unmappedTopologicalNodes);
+    }
+
+    public void isMapped(String mappedTopologicalNode) {
+        this.unmappedTopologicalNodes.remove(mappedTopologicalNode);
+    }
+
+    public CgmesExportContext setUnmappedTopologicalNodes(Set<String> unmappedTopologicalNodes) {
+        this.unmappedTopologicalNodes.clear();
+        this.unmappedTopologicalNodes.addAll(unmappedTopologicalNodes);
         return this;
     }
 }

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.powsybl.cgmes.model.CgmesNamespace.*;
 
@@ -148,5 +149,34 @@ public final class CgmesExportUtil {
         if (p != null) {
             topologicalNodeByBusBreakerBusMapping.computeIfAbsent(b.getId(), s -> new HashSet<>()).add(p.getId(CgmesNames.TOPOLOGICAL_NODE));
         }
+    }
+
+    public static Set<String> getUnmappedTopologicalNodes(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping, Path path) {
+        return getUnmappedTopologicalNodes(topologicalNodeByBusBreakerBusMapping, path, TripleStoreFactory.defaultImplementation());
+    }
+
+    public static Set<String> getUnmappedTopologicalNodes(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping, Path path, String tripleStoreImpl) {
+        DataSource dataSource = Importers.createDataSource(path);
+        return getUnmappedTopologicalNodes(topologicalNodeByBusBreakerBusMapping, dataSource, tripleStoreImpl);
+    }
+
+    public static Set<String> getUnmappedTopologicalNodes(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping, DataSource dataSource) {
+        return getUnmappedTopologicalNodes(topologicalNodeByBusBreakerBusMapping, dataSource, TripleStoreFactory.defaultImplementation());
+    }
+
+    public static Set<String> getUnmappedTopologicalNodes(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping, DataSource dataSource, String tripleStoreImpl) {
+        CgmesModel model = CgmesModelFactory.create(dataSource, null, tripleStoreImpl);
+        return getUnmappedTopologicalNodes(topologicalNodeByBusBreakerBusMapping, model);
+    }
+
+    public static Set<String> getUnmappedTopologicalNodes(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping, CgmesModel model) {
+        Set<String> unmappedTopologicalNodes = new HashSet<>();
+        Set<String> mapped = topologicalNodeByBusBreakerBusMapping.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        model.topologicalNodes()
+                .pluckLocals("TopologicalNode")
+                .stream()
+                .filter(tn -> !mapped.contains(tn))
+                .forEach(unmappedTopologicalNodes::add);
+        return unmappedTopologicalNodes;
     }
 }
