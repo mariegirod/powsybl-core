@@ -13,10 +13,7 @@ import com.powsybl.cgmes.model.CgmesNamespace;
 import com.powsybl.iidm.network.Network;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Miora Ralambotiana <miora.ralambotiana at rte-france.com>
@@ -34,6 +31,8 @@ public class CgmesExportContext {
     private String modelingAuthoritySet = "powsybl.org";
 
     private boolean exportBoundaryPowerFlows = false;
+
+    private Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping = new HashMap<>();
 
     public CgmesExportContext(Network network) {
         CimCharacteristics cimCharacteristics = network.getExtension(CimCharacteristics.class);
@@ -138,5 +137,20 @@ public class CgmesExportContext {
 
     public String getCimNamespace() {
         return CgmesNamespace.getCimNamespace(cimVersion);
+    }
+
+    public Set<String> getTopologicalNodesByBusBreakerBus(String busId) {
+        if (topologyKind == CgmesTopologyKind.NODE_BREAKER) {
+            return topologicalNodeByBusBreakerBusMapping.get(busId);
+        } else if (topologyKind == CgmesTopologyKind.BUS_BRANCH) {
+            return Collections.singleton(busId);
+        }
+        return Optional.ofNullable(topologicalNodeByBusBreakerBusMapping.get(busId)).orElseGet(() -> Collections.singleton(busId));
+    }
+
+    public CgmesExportContext setTopologicalNodeByBusBreakerBusMapping(Map<String, Set<String>> topologicalNodeByBusBreakerBusMapping) {
+        this.topologicalNodeByBusBreakerBusMapping.clear();
+        this.topologicalNodeByBusBreakerBusMapping.putAll(topologicalNodeByBusBreakerBusMapping);
+        return this;
     }
 }
