@@ -236,8 +236,14 @@ public class PsseValidation {
             validateTransformerBus(buses, transformer.getI(), "I");
             validateTransformerBus(buses, transformer.getJ(), "J");
 
-            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getX12(), "X");
-            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getCkt(), transformer.getWindingRecord1().getWindv(), "ratio");
+            String id = String.format("%d %d %s", transformer.getI(), transformer.getJ(), transformer.getCkt());
+            validateTransformerX(id, transformer.getX12(), "X12");
+            validateTransformerRatio(id, transformer.getWindingRecord1().getWindv(), "ratio");
+            validateTransformerSbase(id, transformer.getCz(), transformer.getCm(), transformer.getSbase12(), "sbase12");
+            validateTransformerWindingNomV(id, transformer.getCw(), transformer.getCm(), transformer.getWindingRecord1().getNomv(), "winding1 nomV");
+            validateTransformerWindingVmiVma(id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getVmi(), transformer.getWindingRecord1().getVma(), "winding1 Vmi Vma");
+            validateTransformerWindingRmiRma(id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getRmi(), transformer.getWindingRecord1().getRma(), "winding1 Rmi Rma");
+            validateTransformerWindingCont(buses, id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getCont(), "winding1 Cont");
 
             addBusesMap(busesTransformers, transformer.getI(), transformer.getJ(), transformer.getCkt());
         }
@@ -261,13 +267,34 @@ public class PsseValidation {
             validateTransformerBus(buses, transformer.getJ(), "J");
             validateTransformerBus(buses, transformer.getK(), "K");
 
-            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX12(), "X12");
-            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX31(), "X31");
-            validateTransformerX(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getX23(), "X23");
+            String id = String.format("%d %d %d %s", transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt());
+            validateTransformerX(id, transformer.getX12(), "X12");
+            validateTransformerX(id, transformer.getX31(), "X31");
+            validateTransformerX(id, transformer.getX23(), "X23");
 
-            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord1().getWindv(), "winding1 ratio");
-            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord2().getWindv(), "winding2 ratio");
-            validateTransformerRatio(transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt(), transformer.getWindingRecord3().getWindv(), "winding3 ratio");
+            validateTransformerRatio(id, transformer.getWindingRecord1().getWindv(), "winding1 ratio");
+            validateTransformerRatio(id, transformer.getWindingRecord2().getWindv(), "winding2 ratio");
+            validateTransformerRatio(id, transformer.getWindingRecord3().getWindv(), "winding3 ratio");
+
+            validateTransformerSbase(id, transformer.getCz(), transformer.getCm(), transformer.getSbase12(), "sbase12");
+            validateTransformerSbase(id, transformer.getCz(), transformer.getCm(), transformer.getSbase23(), "sbase23");
+            validateTransformerSbase(id, transformer.getCz(), transformer.getCm(), transformer.getSbase31(), "sbase31");
+
+            validateTransformerWindingNomV(id, transformer.getCz(), transformer.getCm(), transformer.getWindingRecord1().getNomv(), "winding1 nomV");
+            validateTransformerWindingNomV(id, transformer.getCz(), transformer.getCm(), transformer.getWindingRecord2().getNomv(), "winding2 nomV");
+            validateTransformerWindingNomV(id, transformer.getCz(), transformer.getCm(), transformer.getWindingRecord3().getNomv(), "winding3 nomV");
+
+            validateTransformerWindingVmiVma(id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getVmi(), transformer.getWindingRecord1().getVma(), "winding1 Vmi Vma");
+            validateTransformerWindingVmiVma(id, transformer.getWindingRecord2().getCod(), transformer.getWindingRecord2().getVmi(), transformer.getWindingRecord2().getVma(), "winding2 Vmi Vma");
+            validateTransformerWindingVmiVma(id, transformer.getWindingRecord3().getCod(), transformer.getWindingRecord3().getVmi(), transformer.getWindingRecord3().getVma(), "winding3 Vmi Vma");
+
+            validateTransformerWindingRmiRma(id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getRmi(), transformer.getWindingRecord1().getRma(), "winding1 Rmi Rma");
+            validateTransformerWindingRmiRma(id, transformer.getWindingRecord2().getCod(), transformer.getWindingRecord2().getRmi(), transformer.getWindingRecord2().getRma(), "winding2 Rmi Rma");
+            validateTransformerWindingRmiRma(id, transformer.getWindingRecord3().getCod(), transformer.getWindingRecord3().getRmi(), transformer.getWindingRecord3().getRma(), "winding3 Rmi Rma");
+
+            validateTransformerWindingCont(buses, id, transformer.getWindingRecord1().getCod(), transformer.getWindingRecord1().getCont(), "winding1 Cont");
+            validateTransformerWindingCont(buses, id, transformer.getWindingRecord2().getCod(), transformer.getWindingRecord2().getCont(), "winding2 Cont");
+            validateTransformerWindingCont(buses, id, transformer.getWindingRecord3().getCod(), transformer.getWindingRecord3().getCont(), "winding3 Cont");
 
             addBusesMap(busesTransformers, transformer.getI(), transformer.getJ(), transformer.getK(), transformer.getCkt());
         }
@@ -289,30 +316,59 @@ public class PsseValidation {
         }
     }
 
-    private void validateTransformerX(int busI, int busJ, String ckt, double x, String xTag) {
+    private void validateTransformerX(String id, double x, String xTag) {
         if (x == 0.0) {
-            warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected %s: %.5f", busI, busJ, ckt, xTag, x));
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f", id, xTag, x));
             validCase = false;
         }
     }
 
-    private void validateTransformerX(int busI, int busJ, int busK, String ckt, double x, String xTag) {
-        if (x == 0.0) {
-            warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected %s: %.5f", busI, busJ, busK, ckt, xTag, x));
-            validCase = false;
-        }
-    }
-
-    private void validateTransformerRatio(int busI, int busJ, String ckt, double ratio, String ratioTag) {
+    private void validateTransformerRatio(String id, double ratio, String ratioTag) {
         if (ratio <= 0.0) {
-            warnings.add(String.format(Locale.US, "Transformer: %d %d %s Unexpected %s: %.5f", busI, busJ, ckt, ratioTag, ratio));
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f", id, ratioTag, ratio));
             validCase = false;
         }
     }
 
-    private void validateTransformerRatio(int busI, int busJ, int busK, String ckt, double ratio, String ratioTag) {
-        if (ratio <= 0.0) {
-            warnings.add(String.format(Locale.US, "Transformer: %d %d %d %s Unexpected %s: %.5f", busI, busJ, busK, ckt, ratioTag, ratio));
+    private void validateTransformerSbase(String id, int cz, int cm, double sbase, String sbaseTag) {
+        if ((cz == 2 || cz == 3 || cm == 2) && sbase <= 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f", id, sbaseTag, sbase));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerWindingNomV(String id, int cw, int cm, double windingNomV, String windingNomVTag) {
+        if ((cw == 3 || cm == 2) && windingNomV <= 0.0) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f", id, windingNomVTag, windingNomV));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerWindingVmiVma(String id, int cod, double windingVmi, double windingVma, String windingVmiVmaTag) {
+        if (Math.abs(cod) == 1 && (windingVmi <= 0.0 || windingVma <= 0.0 || windingVma < windingVmi)) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f %.5f", id, windingVmiVmaTag, windingVmi, windingVma));
+            validCase = false;
+        }
+        if ((Math.abs(cod) == 2 || Math.abs(cod) == 3 || Math.abs(cod) == 5) &&  windingVma < windingVmi) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f %.5f", id, windingVmiVmaTag, windingVmi, windingVma));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerWindingRmiRma(String id, int cod, double windingRmi, double windingRma, String windingRmiRmaTag) {
+        if ((Math.abs(cod) == 1 || Math.abs(cod) == 2) && (windingRmi <= 0.0 || windingRma <= 0.0 || windingRma < windingRmi)) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f %.5f", id, windingRmiRmaTag, windingRmi, windingRma));
+            validCase = false;
+        }
+        if ((Math.abs(cod) == 3 || Math.abs(cod) == 5) &&  windingRma < windingRmi) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %.5f %.5f", id, windingRmiRmaTag, windingRmi, windingRma));
+            validCase = false;
+        }
+    }
+
+    private void validateTransformerWindingCont(Map<Integer, List<Integer>> buses, String id, int cod, int windingCont, String windingContTag) {
+        if (Math.abs(cod) == 1 && (windingCont == 0 || !buses.containsKey(Math.abs(windingCont)))) {
+            warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %d", id, windingContTag, windingCont));
             validCase = false;
         }
     }
