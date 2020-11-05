@@ -441,13 +441,16 @@ public abstract class AbstractConductingEquipmentConversion extends AbstractIden
         }
     }
 
-    protected void addAliases(Identifiable<?> identifiable) {
+    protected void addAliasesAndProperties(Identifiable<?> identifiable) {
         int i = 1;
         for (TerminalData td : terminals) {
             if (td == null) {
                 return;
             }
             identifiable.addAlias(td.t.id(), Conversion.CGMES_PREFIX_ALIAS + CgmesNames.TERMINAL + i);
+            if (context.nodeBreaker()) {
+                identifiable.setProperty(Conversion.CGMES_PREFIX_ALIAS + CgmesNames.CONNECTIVITY_NODE + i, td.busId);
+            }
             i++;
         }
     }

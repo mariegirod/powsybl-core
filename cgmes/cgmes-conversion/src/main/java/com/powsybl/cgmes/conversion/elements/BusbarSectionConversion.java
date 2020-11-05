@@ -35,7 +35,7 @@ public class BusbarSectionConversion extends AbstractConductingEquipmentConversi
                 .setEnsureIdUnicity(false);
         bbsAdder.setNode(iidmNode());
         BusbarSection bbs = bbsAdder.add();
-        addAliases(bbs);
+        addAliasesAndProperties(bbs);
         convertedTerminals(bbs.getTerminal());
     }
 }
