@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.powsybl.psse.model.PsseConstants.PsseVersion;
+
 /**
  * @author Luma Zamarreño <zamarrenolm at aia.es>
  * @author José Antonio Marqués <marquesja at aia.es>
@@ -58,6 +60,8 @@ public class PsseValidation {
         validateGenerators(model.getBuses(), model.getGenerators(), buses);
         validateNonTransformerBranches(model.getNonTransformerBranches(), buses);
         validateTransformers(model.getTransformers(), buses);
+
+        validateSwitchedShunts(model.getSwitchedShunts(), buses);
     }
 
     private static Map<Integer, List<Integer>> generateBuses(List<PsseBus> psseBuses) {
@@ -370,6 +374,68 @@ public class PsseValidation {
         if (Math.abs(cod) == 1 && (windingCont == 0 || !buses.containsKey(Math.abs(windingCont)))) {
             warnings.add(String.format(Locale.US, "Transformer: %s Unexpected %s: %d", id, windingContTag, windingCont));
             validCase = false;
+        }
+    }
+
+    private void validateSwitchedShunts(List<PsseSwitchedShunt> switchedShunts, Map<Integer, List<Integer>> buses) {
+        Map<String, List<String>> busesSwitchedShunts = new HashMap<>();
+
+        final PsseVersion psseVersion = switchedShuntPsseVersion(switchedShunts);
+
+        for (int i = 0; i < switchedShunts.size(); i++) {
+            PsseSwitchedShunt switchedShunt = switchedShunts.get(i);
+            if (!buses.containsKey(switchedShunt.getI())) {
+                warnings.add(String.format("SwitchedShunt: Unexpected I: %d", switchedShunt.getI()));
+                validCase = false;
+            }
+            String id = switchedShuntId(switchedShunt, psseVersion);
+            if (switchedShunt.getModsw() != 0 && switchedShunt.getSwrem() != 0 && !buses.containsKey(switchedShunt.getSwrem())) {
+                warnings.add(String.format("SwitchedShunt: %s Unexpected Swrem: %d", id, switchedShunt.getSwrem()));
+                validCase = false;
+            }
+            if (switchedShunt.getModsw() != 0 && (switchedShunt.getVswlo() <= 0.0 || switchedShunt.getVswhi() <= 0.0 || switchedShunt.getVswhi() < switchedShunt.getVswlo())) {
+                warnings.add(String.format("SwitchedShunt: %s Unexpected Vswlo Vswhi: %.5f %.5f", id, switchedShunt.getVswlo(), switchedShunt.getVswhi()));
+                validCase = false;
+            }
+            addSwitchedShuntBusesMap(busesSwitchedShunts, switchedShunt, psseVersion);
+        }
+
+        Map<String, List<String>> duplicatedBusesFixedShunts = getDuplicates(busesSwitchedShunts);
+        if (!duplicatedBusesFixedShunts.isEmpty()) {
+            duplicatedBusesFixedShunts.forEach((key, value) -> warnings.add(multipleSwitchedShuntString(key, value, psseVersion)));
+            validCase = false;
+        }
+    }
+
+    private static PsseVersion switchedShuntPsseVersion(List<PsseSwitchedShunt> switchedShunts) {
+        if (switchedShunts.stream().anyMatch(switchedShunt -> switchedShunt instanceof PsseSwitchedShunt35)) {
+            return PsseVersion.VERSION_35;
+        } else {
+            return PsseVersion.VERSION_33;
+        }
+    }
+
+    private static String switchedShuntId(PsseSwitchedShunt switchedShunt, PsseVersion psseVersion) {
+        if (psseVersion == PsseVersion.VERSION_35) {
+            return String.format("%d %s", switchedShunt.getI(), ((PsseSwitchedShunt35) switchedShunt).getId());
+        } else {
+            return String.format("%d", switchedShunt.getI());
+        }
+    }
+
+    private static void addSwitchedShuntBusesMap(Map<String, List<String>> busesSwitchedShunts, PsseSwitchedShunt switchedShunt, PsseVersion psseVersion) {
+        if (psseVersion == PsseVersion.VERSION_35) {
+            addBusesMap(busesSwitchedShunts, switchedShunt.getI(), ((PsseSwitchedShunt35) switchedShunt).getId());
+        } else {
+            addBusesMap(busesSwitchedShunts, switchedShunt.getI(), "1");
+        }
+    }
+
+    private static String multipleSwitchedShuntString(String key, List<String> value, PsseVersion psseVersion) {
+        if (psseVersion == PsseVersion.VERSION_35) {
+            return String.format("SwitchedShunt: Multiple fixed shunts (%d) at bus %d with the same Id %s", value.size(), Integer.valueOf(key), value.get(0));
+        } else {
+            return String.format("SwitchedShunt: Multiple fixed shunts (%d) at bus %d", value.size(), Integer.valueOf(key));
         }
     }
 
