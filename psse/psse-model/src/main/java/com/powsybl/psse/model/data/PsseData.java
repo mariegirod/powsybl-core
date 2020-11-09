@@ -142,9 +142,7 @@ public class PsseData {
 
         model.addTransformers(new TransformerData(version).read(reader, context));
         model.addAreas(new AreaInterchangeData(version).read(reader, context));
-
-        // 2-terminal DC data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
+        model.addTwoTerminalDcTransmissionLines(new TwoTerminalDcTransmissionLineData(version).read(reader, context));
 
         // voltage source converter data
         BlockData.readDiscardedRecordBlock(reader); // TODO
@@ -189,6 +187,7 @@ public class PsseData {
         model.addTransformers(new TransformerData(version, format).readx(networkNode, context));
 
         model.addAreas(new AreaInterchangeData(version, format).readx(networkNode, context));
+        model.addTwoTerminalDcTransmissionLines(new TwoTerminalDcTransmissionLineData(version, format).readx(networkNode, context));
         model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version, format).readx(networkNode, context));
         model.addLineGrouping(new MultiSectionLineGroupingData(version, format).readx(networkNode, context));
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
@@ -253,8 +252,8 @@ public class PsseData {
     public void writeBlocksB(PsseRawModel model, PsseVersion version, PsseContext context, OutputStream outputStream) {
         new TransformerData(version).write(model, context, outputStream);
         new AreaInterchangeData(version).write(model, context, outputStream);
+        new TwoTerminalDcTransmissionLineData(version).write(model, context, outputStream);
 
-        BlockData.writeEndOfBlockAndComment("END OF TWO-TERMINAL DC DATA, BEGIN VOLTAGE SOURCE CONVERTER DATA", outputStream);
         BlockData.writeEndOfBlockAndComment("END OF VOLTAGE SOURCE CONVERTER DATA, BEGIN IMPEDANCE CORRECTION DATA", outputStream);
         new TransformerImpedanceCorrectionTablesData(version).write(model, context, outputStream);
         BlockData.writeEndOfBlockAndComment("END OF MULTI-TERMINAL DC DATA, BEGIN MULTI-SECTION LINE DATA", outputStream);
@@ -308,6 +307,10 @@ public class PsseData {
         tableData = new AreaInterchangeData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setArea(tableData);
+        }
+        tableData = new TwoTerminalDcTransmissionLineData(version, format).writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setTwotermdc(tableData);
         }
         tableData = new TransformerImpedanceCorrectionTablesData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {

@@ -38,6 +38,7 @@ public class JsonModel {
         private TableData acline;
         private TableData transformer;
         private TableData area;
+        private TableData twotermdc;
         private TableData impcor;
         private TableData msline;
         private TableData zone;
@@ -109,6 +110,14 @@ public class JsonModel {
 
         public TableData getArea() {
             return this.area;
+        }
+
+        void setTwotermdc(TableData twotermdc) {
+            this.twotermdc = twotermdc;
+        }
+
+        public TableData getTwotermdc() {
+            return this.twotermdc;
         }
 
         void setImpcor(TableData impcor) {

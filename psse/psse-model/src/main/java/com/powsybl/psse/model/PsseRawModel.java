@@ -32,6 +32,8 @@ public class PsseRawModel {
 
     private final List<PsseArea> areas = new ArrayList<>();
 
+    private final List<PsseTwoTerminalDcTransmissionLine> twoTerminalDcTransmissionLines = new ArrayList<>();
+
     private final List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections = new ArrayList<>();
 
     private final List<PsseLineGrouping> lineGrouping = new ArrayList<>();
@@ -110,6 +112,14 @@ public class PsseRawModel {
 
     public List<PsseArea> getAreas() {
         return areas;
+    }
+
+    public void addTwoTerminalDcTransmissionLines(List<PsseTwoTerminalDcTransmissionLine> twoTerminalDcTransmissionLines) {
+        this.twoTerminalDcTransmissionLines.addAll(twoTerminalDcTransmissionLines);
+    }
+
+    public List<PsseTwoTerminalDcTransmissionLine> getTwoTerminalDcTransmissionLines() {
+        return twoTerminalDcTransmissionLines;
     }
 
     public void addTransformerImpedanceCorrections(List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections) {
