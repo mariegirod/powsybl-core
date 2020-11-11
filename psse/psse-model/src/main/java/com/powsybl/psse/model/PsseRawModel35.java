@@ -60,6 +60,14 @@ public class PsseRawModel35 extends PsseRawModel {
     }
 
     @Override
+    public void addVoltageSourceConverterDcTransmissionLines(List<PsseVoltageSourceConverterDcTransmissionLine> voltageSourceConverterDcTransmissionLines) {
+        if (voltageSourceConverterDcTransmissionLines.stream().anyMatch(voltageSourceConverterDcTransmissionLine -> !(voltageSourceConverterDcTransmissionLine instanceof PsseVoltageSourceConverterDcTransmissionLine35))) {
+            throw new PsseException("PsseVoltageSourceConverterDcTransmissionLine35. Unexpected instanceof twoTerminalDcTransmissionLine");
+        }
+        getVoltageSourceConverterDcTransmissionLines().addAll(voltageSourceConverterDcTransmissionLines);
+    }
+
+    @Override
     public void addTransformerImpedanceCorrections(List<PsseTransformerImpedanceCorrection> transformerImpedanceCorrections) {
         if (transformerImpedanceCorrections.stream().anyMatch(transformerImpedanceCorrection -> !(transformerImpedanceCorrection instanceof PsseTransformerImpedanceCorrection35))) {
             throw new PsseException("PsseRawModel35. Unexpected instanceof transformerImpedanceCorrection");

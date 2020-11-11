@@ -2580,6 +2580,7 @@
     "arname" : "1           "
   } ],
   "twoTerminalDcTransmissionLines" : [ ],
+  "voltageSourceConverterDcTransmissionLines" : [ ],
   "transformerImpedanceCorrections" : [ ],
   "lineGrouping" : [ ],
   "zones" : [ {

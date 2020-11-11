@@ -1212,6 +1212,7 @@
     "arname" : "IEEE14      "
   } ],
   "twoTerminalDcTransmissionLines" : [ ],
+  "voltageSourceConverterDcTransmissionLines" : [ ],
   "transformerImpedanceCorrections" : [ ],
   "lineGrouping" : [ ],
   "zones" : [ {
