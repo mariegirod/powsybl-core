@@ -7,6 +7,7 @@
 package com.powsybl.iidm.diff;
 
 import java.util.Map;
+import java.util.Objects;
 
 import com.powsybl.iidm.network.Branch.Side;
 
@@ -20,8 +21,8 @@ public class BranchDiffInfo {
     private final Map<Side, TerminalData> terminalData;
 
     public BranchDiffInfo(String branchId, Map<Side, TerminalData> terminalData) {
-        this.branchId = branchId;
-        this.terminalData = terminalData;
+        this.branchId = Objects.requireNonNull(branchId);
+        this.terminalData = Objects.requireNonNull(terminalData);
     }
 
     class TerminalData {
@@ -63,10 +64,13 @@ public class BranchDiffInfo {
     }
 
     public TerminalData getTerminalData(Side side) {
+        Objects.requireNonNull(side);
         return terminalData.get(side);
     }
 
     public void setTerminalData(Side side, TerminalData terminalData) {
+        Objects.requireNonNull(side);
+        Objects.requireNonNull(terminalData);
         this.terminalData.put(side, terminalData);
     }
 }

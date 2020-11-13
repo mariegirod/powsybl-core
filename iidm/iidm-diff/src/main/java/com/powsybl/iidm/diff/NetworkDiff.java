@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -41,28 +42,8 @@ public class NetworkDiff {
         this.branchDiff = new BranchDiffProc(config);
     }
 
-    public class DiffEquipment {
-        private List<String> voltageLevels = null;
-        private List<String> branches = null;
-
-        public List<String> getVoltageLevels() {
-            return voltageLevels;
-        }
-
-        public void setVoltageLevels(List<String> voltageLevels) {
-            this.voltageLevels = voltageLevels;
-        }
-
-        public List<String> getBranches() {
-            return branches;
-        }
-
-        public void setBranches(List<String> branches) {
-            this.branches = branches;
-        }
-    }
-
     static void writeJson(JsonGenerator generator, List<? extends DiffResult> diffResults) {
+        Objects.requireNonNull(generator);
         Objects.requireNonNull(diffResults);
         try {
             generator.writeStartArray();
@@ -76,26 +57,36 @@ public class NetworkDiff {
     }
 
     static void writeJson(Writer writer, List<? extends DiffResult> diffResults) {
+        Objects.requireNonNull(writer);
+        Objects.requireNonNull(diffResults);
         JsonUtil.writeJson(writer, generator -> writeJson(generator, diffResults));
     }
 
     static void writeJson(Path file, List<? extends DiffResult> diffResults) {
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(diffResults);
         JsonUtil.writeJson(file, generator -> writeJson(generator, diffResults));
     }
 
     static String toJson(List<? extends DiffResult> diffResults) {
+        Objects.requireNonNull(diffResults);
         return JsonUtil.toJson(generator -> writeJson(generator, diffResults));
     }
 
     public static String writeJson(NetworkDiffResults ndifr) {
+        Objects.requireNonNull(ndifr);
         return JsonUtil.toJson(ndifr::writeJson);
     }
 
     public static void writeJson(Writer writer, NetworkDiffResults ndifr) {
+        Objects.requireNonNull(writer);
+        Objects.requireNonNull(ndifr);
         JsonUtil.writeJson(writer, ndifr::writeJson);
     }
 
     public static void writeJson(Path file, NetworkDiffResults ndifr) {
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(ndifr);
         JsonUtil.writeJson(file, ndifr::writeJson);
     }
 
@@ -109,22 +100,25 @@ public class NetworkDiff {
         Objects.requireNonNull(diffEquipment);
         long start = System.currentTimeMillis();
 
-        Set<String> vlIds = getVoltageLevelIds(network1, network2, diffEquipment.getVoltageLevels());
-        List<DiffResult> vlDiffs = vlIds.stream()
-                                        .sorted()
-                                        .map(vlId -> voltagediff.diff(network1.getVoltageLevel(vlId), network2.getVoltageLevel(vlId)))
-                                        .filter(DiffResult::isDifferent)
-                                        .collect(Collectors.toList());
-        Set<String> branchIds = getBranchIds(network1, network2, diffEquipment.getBranches());
-        List<DiffResult> branchDiffs = branchIds.stream()
-                                                .sorted()
-                                                .map(branchId -> branchDiff.diff(network1.getBranch(branchId), network2.getBranch(branchId)))
-                                                .filter(DiffResult::isDifferent)
-                                                .collect(Collectors.toList());
+        List<DiffResult> vlDiffs = getVoltageLevelDiffs(network1, network2, diffEquipment);
+        List<DiffResult> branchDiffs = getBranchDiffs(network1, network2, diffEquipment);
         NetworkDiffResults ndifr = new NetworkDiffResults(network1.getId(), network2.getId(), vlDiffs, branchDiffs);
 
         LOGGER.debug("diff generated in {} ms", System.currentTimeMillis() - start);
         return ndifr;
+    }
+
+    private List<DiffResult> getVoltageLevelDiffs(Network network1, Network network2, DiffEquipment diffEquipment) {
+        if (diffEquipment.getEquipmentTypes().contains(DiffEquipmentType.VOLTAGE_LEVELS)
+            || diffEquipment.getEquipmentTypes().contains(DiffEquipmentType.ALL)) {
+            Set<String> vlIds = getVoltageLevelIds(network1, network2, diffEquipment.getVoltageLevels());
+            return vlIds.stream()
+                        .sorted()
+                        .map(vlId -> voltagediff.diff(network1.getVoltageLevel(vlId), network2.getVoltageLevel(vlId)))
+                        .filter(DiffResult::isDifferent)
+                        .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     private Set<String> getVoltageLevelIds(Network network1, Network network2, List<String> vls) {
@@ -133,11 +127,23 @@ public class NetworkDiff {
                            .map(VoltageLevel::getId)
                            .filter(vlId -> network2.getVoltageLevel(vlId) != null)
                            .collect(Collectors.toSet());
-        } else {
-            return vls.stream()
-                      .filter(vlId -> network1.getVoltageLevel(vlId) != null && network2.getVoltageLevel(vlId) != null)
-                      .collect(Collectors.toSet());
         }
+        return vls.stream()
+                  .filter(vlId -> network1.getVoltageLevel(vlId) != null && network2.getVoltageLevel(vlId) != null)
+                  .collect(Collectors.toSet());
+    }
+
+    private List<DiffResult> getBranchDiffs(Network network1, Network network2, DiffEquipment diffEquipment) {
+        if (diffEquipment.getEquipmentTypes().contains(DiffEquipmentType.BRANCHES)
+            || diffEquipment.getEquipmentTypes().contains(DiffEquipmentType.ALL)) {
+            Set<String> branchIds = getBranchIds(network1, network2, diffEquipment.getBranches());
+            return branchIds.stream()
+                            .sorted()
+                            .map(branchId -> branchDiff.diff(network1.getBranch(branchId), network2.getBranch(branchId)))
+                            .filter(DiffResult::isDifferent)
+                            .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     private Set<String> getBranchIds(Network network1, Network network2, List<String> branches) {
@@ -146,10 +152,9 @@ public class NetworkDiff {
                            .map(Branch::getId)
                            .filter(branchId -> network2.getBranch(branchId) != null)
                            .collect(Collectors.toSet());
-        } else {
-            return branches.stream()
-                           .filter(branchId -> network1.getBranch(branchId) != null && network2.getBranch(branchId) != null)
-                           .collect(Collectors.toSet());
         }
+        return branches.stream()
+                       .filter(branchId -> network1.getBranch(branchId) != null && network2.getBranch(branchId) != null)
+                       .collect(Collectors.toSet());
     }
 }

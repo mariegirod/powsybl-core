@@ -7,6 +7,8 @@
 package com.powsybl.iidm.diff.tools;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -14,6 +16,8 @@ import org.apache.commons.cli.Options;
 
 import com.google.auto.service.AutoService;
 import com.powsybl.iidm.diff.DiffConfig;
+import com.powsybl.iidm.diff.DiffEquipment;
+import com.powsybl.iidm.diff.DiffEquipmentType;
 import com.powsybl.iidm.diff.NetworkDiff;
 import com.powsybl.iidm.diff.NetworkDiffResults;
 import com.powsybl.iidm.import_.ImportConfig;
@@ -33,6 +37,7 @@ public class DiffTool implements Tool {
     private static final String INPUT_FILE1 = "input-file1";
     private static final String INPUT_FILE2 = "input-file2";
     private static final String OUTPUT_FILE = "output-file";
+    private static final String EQUIPMENT_TYPES = "equipment-types";
     private static final String VL_IDS = "vl-ids";
     private static final String BRANCH_IDS = "branch-ids";
 
@@ -76,15 +81,22 @@ public class DiffTool implements Tool {
                         .argName("OUTPUT_FILE")
                         .required()
                         .build());
+                options.addOption(Option.builder().longOpt(EQUIPMENT_TYPES)
+                        .desc("equipment types " + Arrays.toString(DiffEquipmentType.values()) + " to compare, all of them if the option if not specified")
+                        .hasArg()
+                        .argName("EQUIPMENT_TYPES")
+                        .numberOfArgs(Option.UNLIMITED_VALUES)
+                        .valueSeparator(',')
+                        .build());
                 options.addOption(Option.builder().longOpt(VL_IDS)
-                        .desc("voltage level ids to consider")
+                        .desc("voltage level ids to compare, all of them if the option if not specified")
                         .hasArg()
                         .argName("VL_IDS")
                         .numberOfArgs(Option.UNLIMITED_VALUES)
                         .valueSeparator(',')
                         .build());
                 options.addOption(Option.builder().longOpt(BRANCH_IDS)
-                        .desc("branch ids to consider")
+                        .desc("branch ids to compare, all of them if the option if not specified")
                         .hasArg()
                         .argName("BRANCH_IDS")
                         .numberOfArgs(Option.UNLIMITED_VALUES)
@@ -105,7 +117,12 @@ public class DiffTool implements Tool {
         String inputFile1 = line.getOptionValue(INPUT_FILE1);
         String inputFile2 = line.getOptionValue(INPUT_FILE2);
         String outputFile = line.getOptionValue(OUTPUT_FILE);
-
+        List<DiffEquipmentType> equipmentTypes = Arrays.asList(DiffEquipmentType.values());
+        if (line.hasOption(EQUIPMENT_TYPES)) {
+            equipmentTypes = Arrays.stream(line.getOptionValues(EQUIPMENT_TYPES))
+                                   .map(DiffEquipmentType::valueOf)
+                                   .collect(Collectors.toList());
+        }
         String[] vlIds = line.getOptionValues(VL_IDS);
         String[] branchIds = line.getOptionValues(BRANCH_IDS);
 
@@ -115,15 +132,15 @@ public class DiffTool implements Tool {
 
         Network network1 = Importers.loadNetwork(context.getFileSystem().getPath(inputFile1), context.getShortTimeExecutionComputationManager(), importConfig, null);
         Network network2 = Importers.loadNetwork(context.getFileSystem().getPath(inputFile2), context.getShortTimeExecutionComputationManager(), importConfig, null);
-        NetworkDiff networkDiff = new NetworkDiff(config);
-        NetworkDiff.DiffEquipment diffEquipment = networkDiff.new DiffEquipment();
+        DiffEquipment diffEquipment = new DiffEquipment();
+        diffEquipment.setEquipmentTypes(equipmentTypes);
         if (vlIds != null) {
             diffEquipment.setVoltageLevels(Arrays.asList(vlIds));
         }
         if (branchIds != null) {
             diffEquipment.setBranches(Arrays.asList(branchIds));
         }
-        NetworkDiffResults ndifr = networkDiff.diff(network1, network2, diffEquipment);
+        NetworkDiffResults ndifr = new NetworkDiff(config).diff(network1, network2, diffEquipment);
         NetworkDiff.writeJson(context.getFileSystem().getPath(outputFile), ndifr);
     }
 }

@@ -99,18 +99,22 @@ public class NetworkDiffTest {
     @Test
     public void testDifferencesSpecificVoltageLevel() {
         NetworkDiff ndiff = new NetworkDiff(config);
-        NetworkDiff.DiffEquipment diffEquipment = ndiff.new DiffEquipment();
+        DiffEquipment diffEquipment = new DiffEquipment();
+        diffEquipment.setEquipmentTypes(Collections.singletonList(DiffEquipmentType.ALL));
         diffEquipment.setVoltageLevels(Collections.singletonList("VLGEN"));
         diffEquipment.setBranches(Collections.singletonList("NGEN_NHV1"));
         NetworkDiffResults noDiffVl = ndiff.diff(network1, network2, diffEquipment);
         assertFalse(noDiffVl.isDifferent());
 
+        diffEquipment.setEquipmentTypes(Collections.singletonList(DiffEquipmentType.VOLTAGE_LEVELS));
         diffEquipment.setVoltageLevels(Collections.singletonList("VLHV2"));
+        diffEquipment.setBranches(null);
         NetworkDiffResults diffVl = ndiff.diff(network1, network2, diffEquipment);
         assertTrue(diffVl.isDifferent());
         assertNotNull(NetworkDiff.writeJson(diffVl));
 
-        diffEquipment.setVoltageLevels(Collections.singletonList("VLGEN"));
+        diffEquipment.setEquipmentTypes(Collections.singletonList(DiffEquipmentType.BRANCHES));
+        diffEquipment.setVoltageLevels(null);
         diffEquipment.setBranches(Collections.singletonList("NHV1_NHV2_2"));
         NetworkDiffResults diffBranch = ndiff.diff(network1, network2, diffEquipment);
         assertTrue(diffBranch.isDifferent());

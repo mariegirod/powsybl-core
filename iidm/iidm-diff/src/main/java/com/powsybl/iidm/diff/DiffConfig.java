@@ -6,6 +6,8 @@
  */
 package com.powsybl.iidm.diff;
 
+import java.util.Objects;
+
 import com.powsybl.commons.config.ModuleConfig;
 import com.powsybl.commons.config.PlatformConfig;
 
@@ -27,6 +29,7 @@ public class DiffConfig {
     }
 
     public static DiffConfig load(PlatformConfig platformConfig) {
+        Objects.requireNonNull(platformConfig);
         double epsilon = EPSILON_DEFAULT;
         boolean filterDiff = FILTER_DIFF_DEFAULT;
         if (platformConfig.moduleExists("networks-diff")) {
