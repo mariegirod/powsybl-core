@@ -41,6 +41,10 @@ public class JsonModel {
         private TableData twotermdc;
         private TableData vscdc;
         private TableData impcor;
+        private TableData ntermdc;
+        private TableData ntermdcconv;
+        private TableData ntermdcbus;
+        private TableData ntermdclink;
         private TableData msline;
         private TableData zone;
         private TableData iatransfer;
@@ -135,6 +139,38 @@ public class JsonModel {
 
         public TableData getImpcor() {
             return this.impcor;
+        }
+
+        void setNtermdc(TableData ntermdc) {
+            this.ntermdc = ntermdc;
+        }
+
+        public TableData getNtermdc() {
+            return this.ntermdc;
+        }
+
+        void setNtermdcconv(TableData ntermdcconv) {
+            this.ntermdcconv = ntermdcconv;
+        }
+
+        public TableData getNtermdcconv() {
+            return this.ntermdcconv;
+        }
+
+        void setNtermdcbus(TableData ntermdcbus) {
+            this.ntermdcbus = ntermdcbus;
+        }
+
+        public TableData getNtermdcbus() {
+            return this.ntermdcbus;
+        }
+
+        void setNtermdclink(TableData ntermdclink) {
+            this.ntermdclink = ntermdclink;
+        }
+
+        public TableData getNtermdclink() {
+            return this.ntermdclink;
         }
 
         void setMsline(TableData msline) {

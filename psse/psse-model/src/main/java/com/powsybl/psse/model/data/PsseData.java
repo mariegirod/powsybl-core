@@ -144,12 +144,8 @@ public class PsseData {
         model.addAreas(new AreaInterchangeData(version).read(reader, context));
         model.addTwoTerminalDcTransmissionLines(new TwoTerminalDcTransmissionLineData(version).read(reader, context));
         model.addVoltageSourceConverterDcTransmissionLines(new VoltageSourceConverterDcTransmissionLineData(version).read(reader, context));
-
-        // impedance correction data
         model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version).read(reader));
-
-        // multi-terminal DC data
-        BlockData.readDiscardedRecordBlock(reader); // TODO
+        model.addMultiTerminalDcTransmissionLines(new MultiTerminalDcTransmissionLineData(version).read(reader, context));
 
         model.addLineGrouping(new MultiSectionLineGroupingData(version).read(reader));
         model.addZones(new ZoneData(version).read(reader, context));
@@ -188,6 +184,7 @@ public class PsseData {
         model.addTwoTerminalDcTransmissionLines(new TwoTerminalDcTransmissionLineData(version, format).readx(networkNode, context));
         model.addVoltageSourceConverterDcTransmissionLines(new VoltageSourceConverterDcTransmissionLineData(version, format).readx(networkNode, context));
         model.addTransformerImpedanceCorrections(new TransformerImpedanceCorrectionTablesData(version, format).readx(networkNode, context));
+        model.addMultiTerminalDcTransmissionLines(new MultiTerminalDcTransmissionLineData(version, format).readx(networkNode, context));
         model.addLineGrouping(new MultiSectionLineGroupingData(version, format).readx(networkNode, context));
         model.addZones(new ZoneData(version, format).readx(networkNode, context));
         model.addInterareaTransfer(new InterareaTransferData(version, format).readx(networkNode, context));
@@ -255,7 +252,7 @@ public class PsseData {
         new VoltageSourceConverterDcTransmissionLineData(version).write(model, context, outputStream);
 
         new TransformerImpedanceCorrectionTablesData(version).write(model, context, outputStream);
-        BlockData.writeEndOfBlockAndComment("END OF MULTI-TERMINAL DC DATA, BEGIN MULTI-SECTION LINE DATA", outputStream);
+        new MultiTerminalDcTransmissionLineData(version).write(model, context, outputStream);
         new MultiSectionLineGroupingData(version).write(model, context, outputStream);
 
         new ZoneData(version).write(model, context, outputStream);
@@ -318,6 +315,23 @@ public class PsseData {
         tableData = new TransformerImpedanceCorrectionTablesData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {
             network.setImpcor(tableData);
+        }
+        MultiTerminalDcTransmissionLineData multiTerminalDcTransmissionLineData = new MultiTerminalDcTransmissionLineData(version, format);
+        tableData = multiTerminalDcTransmissionLineData.writex(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setNtermdc(tableData);
+        }
+        tableData = multiTerminalDcTransmissionLineData.writexConverters(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setNtermdcconv(tableData);
+        }
+        tableData = multiTerminalDcTransmissionLineData.writexBuses(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setNtermdcbus(tableData);
+        }
+        tableData = multiTerminalDcTransmissionLineData.writexLinks(model, context);
+        if (!tableDataIsEmpty(tableData)) {
+            network.setNtermdclink(tableData);
         }
         tableData = new MultiSectionLineGroupingData(version, format).writex(model, context);
         if (!tableDataIsEmpty(tableData)) {

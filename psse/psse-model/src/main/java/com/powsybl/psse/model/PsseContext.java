@@ -27,6 +27,10 @@ public class PsseContext {
     private String[] twoTerminalDcTransmissionLineDataReadFields;
     private String[] voltageSourceConverterDcTransmissionLineDataReadFields;
     private String[] transformerImpedanceCorrectionTablesDataReadFields;
+    private String[] multiTerminalDcTransmissionLineDataReadFields;
+    private String[] multiTerminalDcTransmissionLineDataConverterReadFields;
+    private String[] multiTerminalDcTransmissionLineDataBusReadFields;
+    private String[] multiTerminalDcTransmissionLineDataLinkReadFields;
     private String[] multiSectionLineGroupingDataReadFields;
     private String[] interareaTransferDataReadFields;
     private String[] zoneDataReadFields;
@@ -148,6 +152,38 @@ public class PsseContext {
 
     public String[] getTransformerImpedanceCorrectionTablesDataReadFields() {
         return this.transformerImpedanceCorrectionTablesDataReadFields;
+    }
+
+    public void setMultiTerminalDcTransmissionLineDataReadFields(String[] fields) {
+        this.multiTerminalDcTransmissionLineDataReadFields = fields;
+    }
+
+    public String[] getMultiTerminalDcTransmissionLineDataReadFields() {
+        return this.multiTerminalDcTransmissionLineDataReadFields;
+    }
+
+    public void setMultiTerminalDcTransmissionLineDataConverterReadFields(String[] fields) {
+        this.multiTerminalDcTransmissionLineDataConverterReadFields = fields;
+    }
+
+    public String[] getMultiTerminalDcTransmissionLineDataConverterReadFields() {
+        return this.multiTerminalDcTransmissionLineDataConverterReadFields;
+    }
+
+    public void setMultiTerminalDcTransmissionLineDataBusReadFields(String[] fields) {
+        this.multiTerminalDcTransmissionLineDataBusReadFields = fields;
+    }
+
+    public String[] getMultiTerminalDcTransmissionLineDataBusReadFields() {
+        return this.multiTerminalDcTransmissionLineDataBusReadFields;
+    }
+
+    public void setMultiTerminalDcTransmissionLineDataLinkReadFields(String[] fields) {
+        this.multiTerminalDcTransmissionLineDataLinkReadFields = fields;
+    }
+
+    public String[] getMultiTerminalDcTransmissionLineDataLinkReadFields() {
+        return this.multiTerminalDcTransmissionLineDataLinkReadFields;
     }
 
     public void setMultiSectionLineGroupingDataReadFields(String[] fields) {
